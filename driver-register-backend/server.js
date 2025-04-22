@@ -1,13 +1,15 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import cors from 'cors'; // Use import instead of require
+import cors from 'cors';
+import Driver from './models/Driver.js'; // Import the Driver model
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -15,29 +17,20 @@ mongoose.connect(process.env.MONGO_URI, {
 }).then(() => console.log('MongoDB connected'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
-// Define Driver schema
-const driverSchema = new mongoose.Schema({
-  name: String,
-  licenseNumber: String,
-  vehicleType: String,
-  availability: {
-    type: String,
-    enum: ['Available', 'Unavailable'],
-    default: 'Available',
-  }
-});
-
-const Driver = mongoose.model('Driver', driverSchema);
-
 // Routes
 app.post('/drivers', async (req, res) => {
   try {
-    const { name, licenseNumber, vehicleType ,availability} = req.body;
-    const newDriver = new Driver({ name, licenseNumber, vehicleType });
+    const { name, licenseNumber, vehicleType, availability, location } = req.body;
+
+    if (!location) {
+      return res.status(400).json({ error: 'Location is required' });
+    }
+
+    const newDriver = new Driver({ name, licenseNumber, vehicleType, availability, location });
     await newDriver.save();
-    res.status(201).json({ message: 'Driver added successfully' });
+    res.status(201).json({ message: 'Driver added successfully', driver: newDriver });
   } catch (err) {
-    res.status(500).json({ error: 'Something went wrong' });
+    res.status(500).json({ error: 'Something went wrong', details: err.message });
   }
 });
 
@@ -77,31 +70,33 @@ app.post('/drivers/login', async (req, res) => {
   }
 });
 
-//update driver availability
-app.patch('/drivers/:id', async (req,res) => {
+app.patch('/drivers/:id', async (req, res) => {
   try {
-    const {availability} = req.body;
-    if (!['Available', 'Unavailable'].includes(availability)) {
+    const { availability, location } = req.body;
+
+    if (availability && !['Available', 'Unavailable'].includes(availability)) {
       return res.status(400).json({ error: 'Invalid availability value' });
     }
-    const driver = await Driver.findByIdAndUpdate(
-      req.params.id,
-      { availability},
-      { new: true }
 
-    );
-    if (!driver){
-      return res.status(404).json({ error: 'Driver not found' });
-
+    if (location && typeof location !== 'string') {
+      return res.status(400).json({ error: 'Invalid location value' });
     }
-    res.json({ message: 'Driver availability updated successfully', driver });
 
-  }catch (err) {
-    res.status(500).json({ error: 'Error updating driver availability' });
+    const updateFields = {};
+    if (availability) updateFields.availability = availability;
+    if (location) updateFields.location = location;
+
+    const driver = await Driver.findByIdAndUpdate(req.params.id, updateFields, { new: true });
+
+    if (!driver) {
+      return res.status(404).json({ error: 'Driver not found' });
+    }
+
+    res.json({ message: 'Driver updated successfully', driver });
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating driver', details: err.message });
   }
 });
-
-
 
 // Start server
 const PORT = process.env.PORT || 5001;
