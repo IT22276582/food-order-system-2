@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  restaurant-backend:
+    build:
+      context: ../Restaurant-backend
+      dockerfile: Dockerfile
+    container_name: restaurant-backend
+    restart: always
+    ports:
+      - "5002:5002"
+    env_file:
+      - ../Restaurant-backend/.env 
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/restaurantdb
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:

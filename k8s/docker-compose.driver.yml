@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  driver-login-service:
+    build: ../driver-register-backend
+    ports:
+      - "5001:5001"
+    env_file:
+      - ../driver-register-backend/.env 
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/logindb
+      - PORT=5001
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:
