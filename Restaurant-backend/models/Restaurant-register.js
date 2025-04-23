@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose';
-import bcrypt from 'bcryptjs'; // Use bcryptjs instead of bcrypt
-
+import bcrypt from 'bcryptjs';
 
 const restaurantSchema = new Schema({
   name: { type: String, required: true },
