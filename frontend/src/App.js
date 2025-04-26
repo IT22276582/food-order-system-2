@@ -10,7 +10,7 @@ import FoodItemsPage from './foodItemsPage';
 import OrdersPage from './OrdersPage';
 import DriversHomePage from './DriversHomePage';
 import DriverLogin from './DriverLogin';
-
+import PaymentWithStripe from './payment';
 
 
 
@@ -29,6 +29,10 @@ function App() {
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/driver-home" element={<DriversHomePage />} />
         <Route path="/driver-login" element={<DriverLogin />} />
+        <Route
+            path="/checkout"
+            element={<PaymentWithStripe orderId="12345" amount={1000} />}
+          />
 
 
 
