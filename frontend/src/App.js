@@ -10,6 +10,9 @@ import FoodItemsPage from './foodItemsPage';
 import OrdersPage from './OrdersPage';
 import DriversHomePage from './DriversHomePage';
 import DriverLogin from './DriverLogin';
+
+import PaymentWithStripe from './payment';
+
 import CustomerHome from './CustomerHome';
 import Orders from './customernavigationpages/Orders';
 import ViewOrders from './customernavigationpages/ViewOrders';
@@ -38,6 +41,9 @@ function App() {
         <Route path="/orderpage" element={<OrdersPage />} />
         <Route path="/driver-home" element={<DriversHomePage />} />
         <Route path="/driver-login" element={<DriverLogin />} />
+
+        <Route path="/checkout"  element={<PaymentWithStripe orderId="12345" amount={1000} />} />
+
         <Route path="/customerRegister" element={<CustomerRegister />} />
         <Route path="/customerlogin" element={<CustomerLogin />} />
         <Route path="/customerregister" element={<CustomerRegister />} />
@@ -46,6 +52,7 @@ function App() {
         <Route path="/viewOrders" element={<ViewOrders />} />
         <Route path="/editProfile/*" element={<EditProfile />} />
         <Route path="/foodadd2" element={<Foodadd2 />} />
+
 
 
 
