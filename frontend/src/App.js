@@ -17,6 +17,8 @@ import CustomerHome from './CustomerHome';
 import Orders from './customernavigationpages/Orders';
 import ViewOrders from './customernavigationpages/ViewOrders';
 import EditProfile from './customernavigationpages/EditProfile';
+import Viewitems from './customernavigationpages/viewitems';
+
 import Foodadd2 from './Foodadd2';
 
 
@@ -52,6 +54,8 @@ function App() {
         <Route path="/viewOrders" element={<ViewOrders />} />
         <Route path="/editProfile/*" element={<EditProfile />} />
         <Route path="/foodadd2" element={<Foodadd2 />} />
+        <Route path="/viewitems" element={<Viewitems />} />
+
 
 
 

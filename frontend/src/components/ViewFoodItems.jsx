@@ -3,14 +3,12 @@ import axios from 'axios';
 
 function ViewFoodItems() {
   const [foodItems, setFoodItems] = useState([]);
-  const [orders, setOrders] = useState([]); // State to store orders
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
     fetchFoodItems();
-    fetchOrders(); // Fetch existing orders on page load
   }, []);
 
   const fetchFoodItems = async () => {
@@ -21,15 +19,6 @@ function ViewFoodItems() {
     } catch (err) {
       setError('Failed to fetch food items');
       setLoading(false);
-    }
-  };
-
-  const fetchOrders = async () => {
-    try {
-      const response = await axios.get('http://localhost:5002/api/orders'); // Replace with your backend URL
-      setOrders(response.data);
-    } catch (err) {
-      setError('Failed to fetch orders');
     }
   };
 
@@ -54,21 +43,8 @@ function ViewFoodItems() {
 
       const response = await axios.post('http://localhost:5002/api/orders', orderPayload);
       setMessage(response.data.message || 'Order placed successfully!');
-      fetchOrders(); // Refresh the orders list after placing an order
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to place order');
-    }
-  };
-
-  const handleUpdateStatus = async (orderId, newStatus) => {
-    try {
-      const response = await axios.patch(`http://localhost:5002/api/orders/${orderId}/status`, {
-        status: newStatus,
-      });
-      setMessage(response.data.message || 'Order status updated successfully!');
-      fetchOrders(); // Refresh the orders list after updating the status
-    } catch (err) {
-      setMessage(err.response?.data?.error || 'Failed to update order status');
     }
   };
 
@@ -116,57 +92,6 @@ function ViewFoodItems() {
           </li>
         ))}
       </ul>
-
-      <h2>Orders</h2>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {orders.map((order) => (
-          <li
-            key={order._id}
-            style={{
-              border: '1px solid #ddd',
-              padding: '10px',
-              marginBottom: '10px',
-              borderRadius: '5px',
-            }}
-          >
-            <h3>Order #{order._id}</h3>
-            <p>Customer: {order.customerName}</p>
-            <p>Address: {order.customerAddress}</p>
-            <p>Location: {order.location}</p>
-            <p>Status: {order.status}</p>
-            <p>Food Item: {order.foodItem.foodId.name} - Quantity: {order.foodItem.quantity}</p>
-            <p>Total Amount: ${order.totalAmount}</p>
-            <button
-              onClick={() => handleUpdateStatus(order._id, 'Assigned')}
-              style={{
-                padding: '5px 10px',
-                backgroundColor: '#28a745',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginRight: '10px',
-              }}
-            >
-              Mark as Assigned
-            </button>
-            <button
-              onClick={() => handleUpdateStatus(order._id, 'Delivered')}
-              style={{
-                padding: '5px 10px',
-                backgroundColor: '#007bff',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
-            >
-              Mark as Delivered
-            </button>
-          </li>
-        ))}
-      </ul>
-
       {message && <p style={{ color: 'green', marginTop: '20px' }}>{message}</p>}
     </div>
   );
