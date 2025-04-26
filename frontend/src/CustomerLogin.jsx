@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Navigate , useNavigate, useLocation} from 'react-router-dom';
 
-function CustomerRegister() {
+
+function CustomerLogin() {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    email: '',
   });
   const [message, setMessage] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate
+  
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,17 +20,25 @@ function CustomerRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/register', formData);
-      setMessage('Registration successful!');
-      console.log(response.data);
+      const response = await axios.post('http://localhost:5000/login', formData);
+      const userData = response.data; // userData is the full user object
+      setMessage('Login successful!');
+      console.log(response.data); 
+      localStorage.setItem('user', JSON.stringify(userData)); // ✅ Save to localStorage
+
+      navigate("/customerHome", { state: { user: userData } });
+      
     } catch (err) {
-      setMessage(err.response?.data || 'Registration failed');
+      setMessage(err.response?.data || 'Login failed');
     }
   };
+  const handleregisternavigation = () => {
+    navigate("/customerRegister")
+  }
 
   return (
     <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
-      <h1>Customer Register</h1>
+      <h1>Customer Login</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -46,32 +58,36 @@ function CustomerRegister() {
           required
           style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
         />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-        />
         <button
           type="submit"
           style={{
             padding: '10px 20px',
-            backgroundColor: '#007bff',
+            backgroundColor: '#28a745',
             color: '#fff',
             border: 'none',
             borderRadius: '5px',
             cursor: 'pointer',
           }}
         >
-          Register
+          Login
         </button>
       </form>
-      {message && <p style={{ marginTop: '10px', color: 'green' }}>{message}</p>}
+      <button
+          onClick={handleregisternavigation}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#28a745',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+          }}
+        >
+          register
+        </button>
+      {message && <p style={{ marginTop: '10px', color: 'red' }}>{message}</p>}
     </div>
   );
 }
 
-export default CustomerRegister;
+export default CustomerLogin;

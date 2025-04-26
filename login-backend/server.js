@@ -36,6 +36,57 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Login Route
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await User.findOne({ username, password });
+    if (!user) {
+      return res.status(401).send('Invalid username or password');
+    }
+    res.status(200).json(user); // send back user details
+
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
+// Delete User Route
+app.delete('/delete/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findByIdAndDelete(id);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+    res.status(200).send('User deleted successfully');
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
+// Edit User Route
+app.put('/edit/:id', async (req, res) => {
+  const { id } = req.params;
+  const { username, password, email } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { username, password, email },
+      { new: true, runValidators: true }
+    );
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+    res.status(200).send('User updated successfully');
+  } catch (err) {
+    res.status(400).send('Error: ' + err.message);
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

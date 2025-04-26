@@ -2,14 +2,24 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import FoodHome from './foodHome';
 import DriverRegister from './DriverRegister';
-import CustomerRegister from './CustomerRegister'; // Create this file
-import Login from './login'; // Create this file
+import CustomerRegister from './CustomerRegister';
+import CustomerLogin from './CustomerLogin';
 import RestaurantRegister from './restaurantregister';
 import RestaurantLogin from './restaurantLogin';
 import FoodItemsPage from './foodItemsPage';
 import OrdersPage from './OrdersPage';
 import DriversHomePage from './DriversHomePage';
 import DriverLogin from './DriverLogin';
+import CustomerHome from './CustomerHome';
+import Orders from './customernavigationpages/Orders';
+import ViewOrders from './customernavigationpages/ViewOrders';
+import EditProfile from './customernavigationpages/EditProfile';
+import Foodadd2 from './Foodadd2';
+
+
+
+
+
 
 
 
@@ -22,13 +32,22 @@ function App() {
       <Routes>
         <Route path="/" element={<FoodHome />} />
         <Route path="/driver-register" element={<DriverRegister />} />
-        <Route path="/Login" element={<Login />} />
         <Route path="/restaurant-register" element={<RestaurantRegister />} />
         <Route path="/restaurant-login" element={<RestaurantLogin />} />
         <Route path="/food-items" element={<FoodItemsPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/driver-home" element={<DriversHomePage />} />
         <Route path="/driver-login" element={<DriverLogin />} />
+        <Route path="/customerRegister" element={<CustomerRegister />} />
+        <Route path="/customerlogin" element={<CustomerLogin />} />
+        <Route path="/customerregister" element={<CustomerRegister />} />
+        <Route path="/customerHome/*" element={<CustomerHome />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/viewOrders" element={<ViewOrders />} />
+        <Route path="/editProfile/*" element={<EditProfile />} />
+        <Route path="/foodadd2" element={<Foodadd2 />} />
+
+
 
 
 

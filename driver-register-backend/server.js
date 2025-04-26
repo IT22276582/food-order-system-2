@@ -63,6 +63,7 @@ app.post('/drivers/login', async (req, res) => {
     if (!driver) {
       return res.status(404).json({ error: 'Driver not found' });
     }
+    
 
     res.status(200).json({ message: 'Login successful', driver });
   } catch (err) {

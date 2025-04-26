@@ -5,6 +5,7 @@ const foodItemSchema = new Schema({
   price: { type: Number, required: true },
   description: { type: String },
   restaurant: { type: String, required: true }, // Restaurant name or ID
+  address: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
   availability: { 
     type: String, 

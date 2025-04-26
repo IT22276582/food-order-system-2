@@ -38,9 +38,10 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
+    res.status(200).json(restaurant); // send back user details
 
-    // Login successful
-    res.json({ message: 'Login successful', restaurant: { id: restaurant._id, name: restaurant.name, email: restaurant.email } });
+
+    
   } catch (err) {
     res.status(500).json({ error: 'Failed to login', details: err.message });
   }
