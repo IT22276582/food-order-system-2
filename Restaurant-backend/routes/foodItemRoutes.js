@@ -6,8 +6,8 @@ const router = express.Router();
 // Create a new food item
 router.post('/', async (req, res) => {
   try {
-    const { name, price, description, restaurant, availability } = req.body;
-    const foodItem = new FoodItem({ name, price, description, restaurant, availability });
+    const { name, price, description, restaurant, address,availability } = req.body;
+    const foodItem = new FoodItem({ name, price, description, restaurant, address,availability });
     await foodItem.save();
     res.status(201).json({ message: 'Food item created successfully', foodItem });
   } catch (err) {
@@ -41,10 +41,10 @@ router.get('/:id', async (req, res) => {
 // Update a food item by ID
 router.put('/:id', async (req, res) => {
   try {
-    const { name, price, description, restaurant, availability } = req.body;
+    const { name, price, description, restaurant,address, availability } = req.body;
     const foodItem = await FoodItem.findByIdAndUpdate(
       req.params.id,
-      { name, price, description, restaurant, availability },
+      { name, price, description, restaurant, address,availability },
       { new: true }
     );
     if (!foodItem) {

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+
 
 function RestaurantLogin() {
   const [formData, setFormData] = useState({
@@ -7,6 +9,8 @@ function RestaurantLogin() {
     password: '',
   });
 
+  const navigate = useNavigate(); // Initialize useNavigate
+  
   const [message, setMessage] = useState('');
 
   const handleChange = (e) => {
@@ -17,9 +21,16 @@ function RestaurantLogin() {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5002/api/restaurants/login', formData);
-      setMessage(response.data.message);
-      // Optionally, store restaurant details in localStorage or state
-      console.log('Restaurant Details:', response.data.restaurant);
+      const restaurantData = response.data; // userData is the full user object
+      setMessage('restaurant Login successful!');
+      localStorage.setItem('restaurant', JSON.stringify(restaurantData)); // ✅ Save to localStorage
+
+
+      
+      console.log('Restaurant Details:');
+      navigate('/food-items'); // Redirect to login page after successful registration
+
+      
     } catch (err) {
       setMessage(err.response?.data?.error || 'An error occurred');
     }

@@ -8,6 +8,7 @@ function DriverRegister() {
     licenseNumber: '',
     vehicleType: '',
     availability: 'Available', // Default value for availability
+    location: '', // Add location field
   });
 
   const [drivers, setDrivers] = useState([]);
@@ -86,6 +87,16 @@ function DriverRegister() {
             <option value="Unavailable">Unavailable</option>
           </select>
         </div>
+        <div>
+          <input
+            type="text"
+            name="location"
+            placeholder="Location"
+            value={formData.location}
+            onChange={handleChange}
+            required
+          />
+        </div>
         <button type="submit">Register Driver</button>
       </form>
 
@@ -95,7 +106,7 @@ function DriverRegister() {
       <ul>
         {drivers.map((driver) => (
           <li key={driver._id}>
-            {driver.name} - {driver.licenseNumber} - {driver.vehicleType} - {driver.availability}
+            {driver.name} - {driver.licenseNumber} - {driver.vehicleType} - {driver.availability} - {driver.location}
           </li>
         ))}
       </ul>

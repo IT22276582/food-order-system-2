@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+
+
 import axios from 'axios';
 
 function FoodItemsPage() {
@@ -13,6 +17,20 @@ function FoodItemsPage() {
   const [foodItems, setFoodItems] = useState([]);
   const [message, setMessage] = useState('');
   const [editItemId, setEditItemId] = useState(null); // Track the item being edited
+  const navigate = useNavigate(); // Initialize useNavigate
+
+
+
+  const location = useLocation();
+  let {restaurant } = location.state || {};
+
+  if (!restaurant) {
+    const storedrestaurant = localStorage.getItem('restaurant');
+    if (storedrestaurant) {
+      restaurant = JSON.parse(storedrestaurant);
+    }
+  }
+  
 
   // Fetch food items on component mount
   useEffect(() => {
@@ -87,8 +105,13 @@ function FoodItemsPage() {
   };
 
   return (
+    
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
       <h1>Manage Food Items</h1>
+      <h1>restaurant, {restaurant?.name || "Guest"}!</h1>
+      <p>email: {restaurant?.email || "No Email Available"}</p>
+      <p>address: {restaurant?.address || "No Email Available"}</p>
+
 
       {/* Add/Edit Food Item Form */}
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
@@ -149,6 +172,20 @@ function FoodItemsPage() {
           {editItemId ? 'Update Food Item' : 'Add Food Item'}
         </button>
       </form>
+
+      <button
+         onClick={() => navigate('/foodadd2')}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '10px',
+            cursor: 'pointer',
+          }}
+        >
+          go to food add
+        </button>
 
       {message && <p style={{ color: 'green' }}>{message}</p>}
 

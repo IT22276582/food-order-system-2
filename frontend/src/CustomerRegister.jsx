@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 function CustomerRegister() {
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
+    password: '',
     email: '',
-    phone: '',
   });
-
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [message, setMessage] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,28 +17,34 @@ function CustomerRegister() {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/register', formData);
-      alert(response.data.message);
-      navigate('/login'); // Redirect to login page after successful registration
+      setMessage('Registration successful!');
+      console.log(response.data);
     } catch (err) {
-      alert('Error: ' + (err.response?.data?.error || err.message));
+      setMessage(err.response?.data || 'Registration failed');
     }
   };
 
-  const handlelogin = () => {
-    navigate("/login")
-  }
-
   return (
-    <div>
-      <h1>Customer Registration</h1>
+    <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
+      <h1>Customer Register</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          name="name"
-          placeholder="Name"
-          value={formData.name}
+          name="username"
+          placeholder="Username"
+          value={formData.username}
           onChange={handleChange}
           required
+          style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+          style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
         />
         <input
           type="email"
@@ -49,19 +53,23 @@ function CustomerRegister() {
           value={formData.email}
           onChange={handleChange}
           required
+          style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
         />
-        <input
-          type="text"
-          name="phone"
-          placeholder="Phone"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">Register</button>
-        
+        <button
+          type="submit"
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+          }}
+        >
+          Register
+        </button>
       </form>
-      <button onClick={handlelogin}>Login</button>
+      {message && <p style={{ marginTop: '10px', color: 'green' }}>{message}</p>}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 function DriversHomePage() {
   const [driver, setDriver] = useState(null);
   const [message, setMessage] = useState('');
+  const [newLocation, setNewLocation] = useState(''); // State for updating location
   const location = useLocation();
   const driverId = location.state?.driverId; // Get driverId from React Router state
 
@@ -43,6 +44,20 @@ function DriversHomePage() {
     }
   };
 
+  // Update location
+  const updateLocation = async () => {
+    try {
+      const response = await axios.patch(`http://localhost:5001/drivers/${driverId}`, {
+        location: newLocation,
+      });
+      setDriver(response.data.driver);
+      setMessage('Location updated successfully');
+    } catch (err) {
+      console.error('Error updating location:', err.message);
+      setMessage('Failed to update location');
+    }
+  };
+
   if (!driverId) {
     return <p>{message}</p>;
   }
@@ -57,6 +72,29 @@ function DriversHomePage() {
       <p>License Number: {driver.licenseNumber}</p>
       <p>Vehicle Type: {driver.vehicleType}</p>
       <p>Current Availability: <strong>{driver.availability}</strong></p>
+      <p>Current Location: <strong>{driver.location}</strong></p>
+      <div style={{ marginBottom: '20px' }}>
+        <input
+          type="text"
+          placeholder="Enter new location"
+          value={newLocation}
+          onChange={(e) => setNewLocation(e.target.value)}
+          style={{ padding: '10px', width: '100%', marginBottom: '10px' }}
+        />
+        <button
+          onClick={updateLocation}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+          }}
+        >
+          Update Location
+        </button>
+      </div>
       <button
         onClick={toggleAvailability}
         style={{
