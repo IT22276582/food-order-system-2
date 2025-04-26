@@ -35,14 +35,14 @@ function App() {
         <Route path="/restaurant-register" element={<RestaurantRegister />} />
         <Route path="/restaurant-login" element={<RestaurantLogin />} />
         <Route path="/food-items" element={<FoodItemsPage />} />
-        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orderpage" element={<OrdersPage />} />
         <Route path="/driver-home" element={<DriversHomePage />} />
         <Route path="/driver-login" element={<DriverLogin />} />
         <Route path="/customerRegister" element={<CustomerRegister />} />
         <Route path="/customerlogin" element={<CustomerLogin />} />
         <Route path="/customerregister" element={<CustomerRegister />} />
         <Route path="/customerHome/*" element={<CustomerHome />} />
-        <Route path="/orders" element={<Orders />} />
+        <Route path="/orderss" element={<Orders />} />
         <Route path="/viewOrders" element={<ViewOrders />} />
         <Route path="/editProfile/*" element={<EditProfile />} />
         <Route path="/foodadd2" element={<Foodadd2 />} />
