@@ -3,6 +3,8 @@ import { Link, Route, Routes,useLocation } from 'react-router-dom';
 import Orders from './customernavigationpages/Orders';
 import ViewOrders from './customernavigationpages/ViewOrders';
 import EditProfile from './customernavigationpages/EditProfile';
+import Viewitems from './customernavigationpages/viewitems';
+
 
 
 function CustomerHome() {
@@ -58,14 +60,27 @@ function CustomerHome() {
         >
           Edit Profile
         </Link>
+        
+        <Link
+          to="/customerHome/view-items"
+          style={{
+            color: '#fff',
+            textDecoration: 'none',
+            fontWeight: 'bold',
+          }}
+        >
+          View-items
+        </Link>
       </nav>
 
       {/* Routes */}
       <div style={{ marginTop: '20px' }}>
         <Routes>
-          <Route path="orders" element={<Orders />} />
-          <Route path="view-orders" element={<ViewOrders />} />
-          <Route path="edit-profile" element={<EditProfile />} />
+          <Route path="orders" element={<Orders user={user} />} />
+          <Route path="view-orders" element={<ViewOrders user={user} />} />
+          <Route path="edit-profile" element={<EditProfile user={user} />} />
+          <Route path="view-items" element={<Viewitems user={user} />} />
+
         </Routes>
       </div>
     </div>

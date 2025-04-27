@@ -28,7 +28,7 @@ function ViewFoodItems() {
       alert('Invalid quantity');
       return;
     }
-
+    //view food items
     try {
       const orderPayload = {
         restaurantName: food.restaurant, // Use restaurant name as a string

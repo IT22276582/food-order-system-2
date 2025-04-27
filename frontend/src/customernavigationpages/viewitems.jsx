@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function ViewFoodItems() {
+function ViewFoodItems({ user }) {
   const [foodItems, setFoodItems] = useState([]);
   const [orders, setOrders] = useState([]); // State to store orders
   const [loading, setLoading] = useState(true);
@@ -39,26 +39,40 @@ function ViewFoodItems() {
       alert('Invalid quantity');
       return;
     }
-
+  
+    const address = prompt(`Enter your address:`);
+    if (!address) {
+      alert('Address is required');
+      return;
+    }
+  
+    const location = prompt(`Enter your location:`);
+    if (!location) {
+      alert('Location is required');
+      return;
+    }
+  
     try {
       const orderPayload = {
-        restaurantName: food.restaurant, // Use restaurant name as a string
-        customerName: 'John Doe', // Replace with actual customer name
-        customerAddress: '123 Main St', // Replace with actual customer address
-        location: 'Downtown', // Replace with actual location
+        restaurantName: food.restaurant, 
+        customerName: user.username,
+        customerAddress: address, 
+        location: location, 
+        email: user.email,
         foodItem: {
           foodId: food._id,
           quantity: parseInt(quantity),
         },
       };
-
+  
       const response = await axios.post('http://localhost:5002/api/orders', orderPayload);
       setMessage(response.data.message || 'Order placed successfully!');
-      fetchOrders(); // Refresh the orders list after placing an order
+      fetchOrders(); // Refresh
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to place order');
     }
   };
+  
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
@@ -133,6 +147,7 @@ function ViewFoodItems() {
             <p>Customer: {order.customerName}</p>
             <p>Address: {order.customerAddress}</p>
             <p>Location: {order.location}</p>
+            <p>email: {order.email}</p>
             <p>Status: {order.status}</p>
             <p>Food Item: {order.foodItem.foodId.name} - Quantity: {order.foodItem.quantity}</p>
             <p>Total Amount: ${order.totalAmount}</p>

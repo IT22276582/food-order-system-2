@@ -5,6 +5,7 @@ const orderSchema = new mongoose.Schema({
   customerName: { type: String, required: true },
   customerAddress: { type: String, required: true },
   location: { type: String, required: true },
+  email: { type: String},
   foodItem: {
     foodId: { type: mongoose.Schema.Types.ObjectId, ref: 'FoodItem', required: true },
     quantity: { type: Number, required: true },

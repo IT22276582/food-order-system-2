@@ -8,10 +8,10 @@ const router = express.Router();
 // Create a new order
 router.post('/', async (req, res) => {
   try {
-    const { restaurantName, customerName, customerAddress, location, foodItem } = req.body;
+    const { restaurantName, customerName, customerAddress, location,email,foodItem } = req.body;
 
     // Validate required fields
-    if (!restaurantName || !customerName || !customerAddress || !location || !foodItem) {
+    if (!restaurantName || !customerName || !customerAddress || !location || !email || !foodItem) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
@@ -34,6 +34,7 @@ router.post('/', async (req, res) => {
       customerName,
       customerAddress,
       location,
+      email,
       foodItem,
       totalAmount,
       status: 'Pending',
