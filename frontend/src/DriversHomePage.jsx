@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { useLocation , useNavigate} from 'react-router-dom';
+
+
 
 function DriversHomePage() {
   const [driver, setDriver] = useState(null);
@@ -8,6 +10,8 @@ function DriversHomePage() {
   const [newLocation, setNewLocation] = useState(''); // State for updating location
   const location = useLocation();
   const driverId = location.state?.driverId; // Get driverId from React Router state
+  const navigate = useNavigate();
+
 
   // Fetch driver details
   useEffect(() => {
@@ -43,6 +47,12 @@ function DriversHomePage() {
       setMessage('Failed to update availability');
     }
   };
+
+  const handleorders = () => {
+    navigate('/driverorder');
+  };
+
+  
 
   // Update location
   const updateLocation = async () => {
@@ -109,6 +119,21 @@ function DriversHomePage() {
         Set as {driver.availability === 'Available' ? 'Unavailable' : 'Available'}
       </button>
       {message && <p style={{ marginTop: '20px', color: 'green' }}>{message}</p>}
+
+
+      <button
+        onClick={handleorders}
+        style={{
+          padding: '10px 20px',
+          backgroundColor: driver.availability === 'Available' ? '#dc3545' : '#28a745',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+        }}
+      >
+        view orders
+      </button>
     </div>
   );
 }

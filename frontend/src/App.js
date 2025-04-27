@@ -20,6 +20,10 @@ import EditProfile from './customernavigationpages/EditProfile';
 import Viewitems from './customernavigationpages/viewitems';
 
 import Foodadd2 from './Foodadd2';
+import Driverorder from './Driverorder';
+import Restuarantorderview from './restuarantorderview';
+
+
 
 
 
@@ -55,6 +59,10 @@ function App() {
         <Route path="/editProfile/*" element={<EditProfile />} />
         <Route path="/foodadd2" element={<Foodadd2 />} />
         <Route path="/viewitems" element={<Viewitems />} />
+        <Route path="/driverorder" element={<Driverorder />} />
+        <Route path="/restuarantorderview" element={<Restuarantorderview />} />
+
+
 
 
 

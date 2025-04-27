@@ -189,6 +189,21 @@ function FoodItemsPage() {
 
       {message && <p style={{ color: 'green' }}>{message}</p>}
 
+
+      <button
+         onClick={() => navigate('/restuarantorderview')}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '10px',
+            cursor: 'pointer',
+          }}
+        >
+          view orders
+        </button>
+
       {/* Food Items List */}
       <h2>Food Items</h2>
       <ul style={{ listStyleType: 'none', padding: 0 }}>
