@@ -2,13 +2,16 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Order from '../models/Order.js';
 import FoodItem from '../models/FoodItem.js';
+import axios from 'axios';
+
 
 const router = express.Router();
 
 // Create a new order
+// Create a new order
 router.post('/', async (req, res) => {
   try {
-    const { restaurantName, customerName, customerAddress, location,email,foodItem } = req.body;
+    const { restaurantName, customerName, customerAddress, location, email, foodItem } = req.body;
 
     // Validate required fields
     if (!restaurantName || !customerName || !customerAddress || !location || !email || !foodItem) {
@@ -28,6 +31,30 @@ router.post('/', async (req, res) => {
     // Calculate total amount
     const totalAmount = food.price * foodItem.quantity;
 
+    let assignedDriverId = null;
+    let assignedDriver = null;
+
+    try {
+      // Get the driver based on the location
+      const { data } = await axios.get(`http://localhost:5001/drivers/location/${location}`);
+
+      // Check if there are available drivers
+      if (data && data.length > 0) {
+        // Assign the first available driver (you can add more logic here to pick a driver based on other criteria)
+        assignedDriver = data[0];
+        assignedDriverId = assignedDriver._id;
+
+        // Update the driver's availability to 'Unavailable'
+        assignedDriver.availability = 'Unavailable';
+        await assignedDriver.save();
+      } else {
+        return res.status(404).json({ error: 'No available driver found in this location' });
+      }
+    } catch (error) {
+      console.error('Error fetching driver or assigning driver:', error);
+      return res.status(500).json({ error: 'Error assigning driver', details: error.message });
+    }
+
     // Create the order
     const order = new Order({
       restaurantName,
@@ -36,10 +63,13 @@ router.post('/', async (req, res) => {
       location,
       email,
       foodItem,
+      assignedDriver: assignedDriverId,
+      driverName: assignedDriver.name, // Optionally include the driver's name
       totalAmount,
       status: 'Pending',
     });
 
+    // Save the order to the database
     await order.save();
 
     res.status(201).json({ message: 'Order created successfully', order });
@@ -47,6 +77,7 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to create order', details: err.message });
   }
 });
+
 
 // Get all orders
 router.get('/', async (req, res) => {

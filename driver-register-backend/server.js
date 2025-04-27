@@ -20,6 +20,7 @@ mongoose.connect(process.env.MONGO_URI, {
 // Routes
 app.post('/drivers', async (req, res) => {
   try {
+
     const { name, licenseNumber, vehicleType, availability, location } = req.body;
 
     if (!location) {
@@ -98,6 +99,23 @@ app.patch('/drivers/:id', async (req, res) => {
     res.status(500).json({ error: 'Error updating driver', details: err.message });
   }
 });
+// Filter drivers by location
+app.get('/drivers/location/:location', async (req, res) => {
+  try {
+    const { location } = req.params;
+
+    const drivers = await Driver.find({ location: { $regex: new RegExp(location, 'i') } });
+
+    if (drivers.length === 0) {
+      return res.status(404).json({ message: 'No drivers found in this location' });
+    }
+
+    res.json(drivers);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching drivers by location', details: err.message });
+  }
+});
+
 
 // Start server
 const PORT = process.env.PORT || 5001;
