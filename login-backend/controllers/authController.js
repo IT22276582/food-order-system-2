@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 const register = async (req, res) => {
+  console.log('Registering user:', req.body); // Debugging line 
   const { username, password, email } = req.body;
 
   // Input validation
@@ -27,6 +28,7 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
+  console.log('Logging in user:', req.body); // Debugging line
   const { email, password } = req.body;
 
   // Input validation
