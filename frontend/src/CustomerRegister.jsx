@@ -16,7 +16,7 @@ function CustomerRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/register', formData);
+      const response = await axios.post('http://localhost:5000/api/auth/register', formData);
       setMessage('Registration successful!');
       console.log(response.data);
     } catch (err) {
