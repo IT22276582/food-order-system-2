@@ -1,5 +1,5 @@
-import { sign } from 'jsonwebtoken';
-import User, { findOne } from '../models/user.js'; 
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 const register = async (req, res) => {
   const { username, password, email } = req.body;
@@ -11,7 +11,7 @@ const register = async (req, res) => {
 
   try {
     // Check if user already exists
-    const existingUser = await findOne({ email });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already registered' });
     }
@@ -36,7 +36,7 @@ const login = async (req, res) => {
 
   try {
     // Find user
-    const user = await findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -48,7 +48,7 @@ const login = async (req, res) => {
     }
 
     // Generate JWT
-    const token = sign(
+    const token = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
@@ -60,4 +60,4 @@ const login = async (req, res) => {
   }
 };
 
-export default { register, login };
+export { register, login };

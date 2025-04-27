@@ -1,15 +1,16 @@
-import { Router } from 'express';
-const router = Router();
-import authController from '../controllers/authController';
-import authenticateToken from '../middleware/authMiddleware';
+import express from 'express';
+   import { register, login } from '../controllers/authController.js';
+   import authenticateToken from '../middleware/authMiddleware.js';
 
-// Public routes
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+   const router = express.Router();
 
-// Protected route example
-router.get('/profile', authenticateToken, (req, res) => {
-  res.json({ message: 'Protected route accessed', user: req.user });
-});
+   // Public routes
+   router.post('/register', register);
+   router.post('/login', login);
 
-export default router;
+   // Protected route example
+   router.get('/profile', authenticateToken, (req, res) => {
+     res.json({ message: 'Protected route accessed', user: req.user });
+   });
+
+   export default router;
