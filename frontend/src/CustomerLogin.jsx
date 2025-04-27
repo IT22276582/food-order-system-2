@@ -5,7 +5,7 @@ import { Navigate , useNavigate, useLocation} from 'react-router-dom';
 
 function CustomerLogin() {
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
   });
   const [message, setMessage] = useState('');
@@ -18,10 +18,9 @@ function CustomerLogin() {
   };
 
   const handleSubmit = async (e) => {
-    console.log("formData", formData);
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', formData);
+      const response = await axios.post('http://localhost:5000/login', formData);
       const userData = response.data; // userData is the full user object
       setMessage('Login successful!');
       console.log(response.data); 
@@ -43,9 +42,9 @@ function CustomerLogin() {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
+          name="username"
+          placeholder="Username"
+          value={formData.username}
           onChange={handleChange}
           required
           style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
