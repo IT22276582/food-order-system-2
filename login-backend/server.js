@@ -1,71 +1,40 @@
-// const express = require('express');
-// const mongoose = require('mongoose');
-// const bodyParser = require('body-parser');
-// const cors = require('cors'); // Import cors
-// require('dotenv').config(); // Load .env file
-
-// const app = express();
-// const PORT = process.env.PORT || 5000; // Get port from .env file or default to 5000
-
-// // Middleware
-// app.use(bodyParser.json());
-// app.use(cors()); // Enable CORS
-
-// // Connect to MongoDB
-// mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-//   .then(() => console.log('MongoDB connected'))
-//   .catch(err => console.log(err));
-
-// // User Model
-// const User = mongoose.model('User', {
-//   username: { type: String, required: true },
-//   password: { type: String, required: true },
-//   email: { type: String, unique: true, sparse: true } // Add email field with unique constraint
-// });
-
-// // Register Route
-// app.post('/register', async (req, res) => {
-//   const { username, password, email } = req.body;
-
-//   const user = new User({ username, password, email });
-//   try {
-//     await user.save();
-//     res.status(200).send('User registered successfully');
-//   } catch (err) {
-//     res.status(400).send('Error: ' + err.message);
-//   }
-// });
-
-// // Start server
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
-
-
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const cors = require('cors');
-require('dotenv').config();
-const authRoutes = require('./routes/authRoutes');
+const cors = require('cors'); // Import cors
+require('dotenv').config(); // Load .env file
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000; // Get port from .env file or default to 5000
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors()); // Enable CORS
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log(err));
 
-// Routes
-app.use('/api/auth', authRoutes);
+// User Model
+const User = mongoose.model('User', {
+  username: { type: String, required: true },
+  password: { type: String, required: true },
+  email: { type: String, unique: true, sparse: true } // Add email field with unique constraint
+});
+
+// Register Route
+app.post('/register', async (req, res) => {
+  const { username, password, email } = req.body;
+
+  const user = new User({ username, password, email });
+  try {
+    await user.save();
+    res.status(200).send('User registered successfully');
+  } catch (err) {
+    res.status(400).send('Error: ' + err.message);
+  }
+});
 
 // Login Route
 app.post('/login', async (req, res) => {
