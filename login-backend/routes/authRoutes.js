@@ -1,7 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const authController = require('../controllers/authController').default;
-const authenticateToken = require('../middleware/authMiddleware');
+import { Router } from 'express';
+const router = Router();
+import authController from '../controllers/authController';
+import authenticateToken from '../middleware/authMiddleware';
 
 // Public routes
 router.post('/register', authController.register);
@@ -12,4 +12,4 @@ router.get('/profile', authenticateToken, (req, res) => {
   res.json({ message: 'Protected route accessed', user: req.user });
 });
 
-module.exports = router;
+export default router;
