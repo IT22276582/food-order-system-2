@@ -42,22 +42,22 @@
 // });
 
 
-import express from 'express';
-import { connect } from 'mongoose';
-import { json } from 'body-parser';
-import cors from 'cors';
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 require('dotenv').config();
-import authRoutes from './routes/authRoutes';
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(json());
+app.use(bodyParser.json());
 app.use(cors());
 
 // Connect to MongoDB
-connect(process.env.MONGO_URI, {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
