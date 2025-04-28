@@ -1,0 +1,170 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .view-food-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: #f0f2f5;
+    padding: 1rem;
+  }
+  
+  .view-food-card {
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 800px;
+    width: 100%;
+  }
+  
+  .view-food-card h1 {
+    font-size: 1.75rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .view-food-card h2 {
+    font-size: 1.25rem;
+    color: #333;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .food-items-list,
+  .orders-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .food-item,
+  .order-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #fafafa;
+  }
+  
+  .food-item h3,
+  .order-item h3 {
+    font-size: 1.25rem;
+    color: #333;
+    margin: 0 0 0.5rem;
+  }
+  
+  .food-item p,
+  .order-item p {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0.25rem 0;
+  }
+  
+  .order-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+  }
+  
+  .order-button:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
+  
+  .order-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .order-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .status-button {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .status-button.assigned {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .status-button.assigned:hover:not(:disabled) {
+    background-color: #218838;
+  }
+  
+  .status-button.delivered {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .status-button.delivered:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
+  
+  .status-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .success-message {
+    margin: 1rem 0;
+    text-align: center;
+    color: #28a745;
+    font-size: 0.9rem;
+  }
+  
+  .error-message {
+    margin: 1rem 0;
+    text-align: center;
+    color: #dc3545;
+    font-size: 0.9rem;
+  }
+  
+  .loading-message {
+    text-align: center;
+    font-size: 1rem;
+    color: #333;
+    margin-top: 2rem;
+  }
+  
+  @media (max-width: 600px) {
+    .view-food-card {
+      padding: 1.5rem;
+    }
+  
+    .view-food-card h1 {
+      font-size: 1.5rem;
+    }
+  
+    .view-food-card h2 {
+      font-size: 1.1rem;
+    }
+  
+    .order-actions {
+      flex-direction: column;
+    }
+  
+    .status-button {
+      width: 100%;
+    }
+  }

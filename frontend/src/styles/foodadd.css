@@ -1,0 +1,147 @@
+/* Food Add Page Styles */
+.food-add-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+    padding: 20px;
+  }
+  
+  .food-add-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .food-add-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .food-add-header h1 {
+    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .food-add-subtitle {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+  }
+  
+  .food-add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-group label {
+    font-weight: 600;
+    color: #34495e;
+    font-size: 0.9rem;
+  }
+  
+  .form-input, .form-textarea {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  
+  .form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  }
+  
+  .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .form-input.disabled {
+    background-color: #f8f9fa;
+    color: #7f8c8d;
+    cursor: not-allowed;
+  }
+  
+  .submit-button {
+    background-color: #e74c3c;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .submit-button:hover {
+    background-color: #c0392b;
+  }
+  
+  .submit-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+  }
+  
+  .spinner {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 2px solid white;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .message {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .error {
+    background-color: #fdecea;
+    color: #d32f2f;
+    border: 1px solid #f5c2c7;
+  }
+  
+  .success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c3e6cb;
+  }
+  
+  @media (max-width: 480px) {
+    .food-add-card {
+      padding: 30px 20px;
+    }
+    
+    .food-add-header h1 {
+      font-size: 1.8rem;
+    }
+  }
