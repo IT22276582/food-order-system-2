@@ -1,0 +1,205 @@
+/* Driver Dashboard Styles */
+.driver-dashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+    padding: 20px;
+  }
+  
+  .driver-profile-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .welcome-title {
+    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .driver-info {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .info-label {
+    font-weight: 600;
+    color: #34495e;
+  }
+  
+  .info-value {
+    color: #2c3e50;
+  }
+  
+  .status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+  }
+  
+  .status-badge.available {
+    background-color: #2ecc71;
+  }
+  
+  .status-badge.unavailable {
+    background-color: #e74c3c;
+  }
+  
+  .action-section {
+    margin-top: 30px;
+  }
+  
+  .location-update {
+    margin-bottom: 25px;
+  }
+  
+  .location-update h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+  }
+  
+  .input-group {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .location-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  
+  .location-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  }
+  
+  .update-button {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .update-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .availability-toggle, .orders-button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .availability-toggle {
+    color: white;
+  }
+  
+  .availability-toggle.available {
+    background-color: #e74c3c;
+  }
+  
+  .availability-toggle.unavailable {
+    background-color: #2ecc71;
+  }
+  
+  .availability-toggle:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+  
+  .orders-button {
+    background-color: #f39c12;
+    color: white;
+  }
+  
+  .orders-button:hover {
+    background-color: #e67e22;
+    transform: translateY(-2px);
+  }
+  
+  .message {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-top: 25px;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .error {
+    background-color: #fdecea;
+    color: #d32f2f;
+    border: 1px solid #f5c2c7;
+  }
+  
+  .success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .loading-message, .error-message {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2rem;
+    color: #2c3e50;
+  }
+  
+  .error-message {
+    color: #e74c3c;
+  }
+  
+  @media (max-width: 768px) {
+    .driver-profile-card {
+      padding: 25px;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+    
+    .input-group {
+      flex-direction: column;
+    }
+    
+    .update-button {
+      width: 100%;
+    }
+  }

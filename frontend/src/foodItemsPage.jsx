@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-
-
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './styles/foodorderpage.css';
 
 function FoodItemsPage() {
   const [formData, setFormData] = useState({
@@ -11,28 +9,23 @@ function FoodItemsPage() {
     price: '',
     description: '',
     restaurant: '',
-    availability: 'Available', // Default value
+    availability: 'Available',
   });
-
   const [foodItems, setFoodItems] = useState([]);
   const [message, setMessage] = useState('');
-  const [editItemId, setEditItemId] = useState(null); // Track the item being edited
-  const navigate = useNavigate(); // Initialize useNavigate
-
-
-
+  const [editItemId, setEditItemId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const location = useLocation();
-  let {restaurant } = location.state || {};
 
+  let { restaurant } = location.state || {};
   if (!restaurant) {
-    const storedrestaurant = localStorage.getItem('restaurant');
-    if (storedrestaurant) {
-      restaurant = JSON.parse(storedrestaurant);
+    const storedRestaurant = localStorage.getItem('restaurant');
+    if (storedRestaurant) {
+      restaurant = JSON.parse(storedRestaurant);
     }
   }
-  
 
-  // Fetch food items on component mount
   useEffect(() => {
     fetchFoodItems();
   }, []);
@@ -52,26 +45,27 @@ function FoodItemsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       if (editItemId) {
-        // Update existing food item
         const response = await axios.put(`http://localhost:5002/api/food-items/${editItemId}`, formData);
         setMessage(response.data.message);
-        setEditItemId(null); // Clear edit mode
+        setEditItemId(null);
       } else {
-        // Add new food item
         const response = await axios.post('http://localhost:5002/api/food-items', formData);
         setMessage(response.data.message);
       }
-      fetchFoodItems(); // Refresh the food items list
-      setFormData({ name: '', price: '', description: '', restaurant: '', availability: 'Available' }); // Clear the form
+      fetchFoodItems();
+      setFormData({ name: '', price: '', description: '', restaurant: '', availability: 'Available' });
     } catch (err) {
       setMessage(err.response?.data?.error || 'An error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleEdit = (item) => {
-    setEditItemId(item._id); // Set the item to be edited
+    setEditItemId(item._id);
     setFormData({
       name: item.name,
       price: item.price,
@@ -82,190 +76,166 @@ function FoodItemsPage() {
   };
 
   const handleDelete = async (id) => {
+    setIsLoading(true);
     try {
       const response = await axios.delete(`http://localhost:5002/api/food-items/${id}`);
       setMessage(response.data.message);
-      fetchFoodItems(); // Refresh the food items list
+      fetchFoodItems();
     } catch (err) {
       setMessage(err.response?.data?.error || 'An error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleAvailabilityToggle = async (id, currentAvailability) => {
+    setIsLoading(true);
     try {
       const newAvailability = currentAvailability === 'Available' ? 'Unavailable' : 'Available';
       const response = await axios.patch(`http://localhost:5002/api/food-items/${id}/availability`, {
         availability: newAvailability,
       });
       setMessage(response.data.message);
-      fetchFoodItems(); // Refresh the food items list
+      fetchFoodItems();
     } catch (err) {
       setMessage(err.response?.data?.error || 'An error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <h1>Manage Food Items</h1>
-      <h1>restaurant, {restaurant?.name || "Guest"}!</h1>
-      <p>email: {restaurant?.email || "No Email Available"}</p>
-      <p>address: {restaurant?.address || "No Email Available"}</p>
-
-
-      {/* Add/Edit Food Item Form */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Food Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
+    <div className="food-management-container">
+      <div className="restaurant-header">
+        <h1 className="restaurant-title">{restaurant?.name || 'Restaurant Dashboard'}</h1>
+        <div className="restaurant-info">
+          <p><span className="info-label">Email:</span> {restaurant?.email || 'No Email Available'}</p>
+          <p><span className="info-label">Address:</span> {restaurant?.address || 'No Address Available'}</p>
         </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="number"
-            name="price"
-            placeholder="Price"
-            value={formData.price}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="text"
-            name="restaurant"
-            placeholder="Restaurant Name"
-            value={formData.restaurant}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
-        </div>
-        <button
-          type="submit"
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
-        >
-          {editItemId ? 'Update Food Item' : 'Add Food Item'}
-        </button>
-      </form>
+      </div>
 
-      <button
-         onClick={() => navigate('/foodadd2')}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '10px',
-            cursor: 'pointer',
-          }}
-        >
-          go to food add
-        </button>
-
-      {message && <p style={{ color: 'green' }}>{message}</p>}
-
-
-      <button
-         onClick={() => navigate('/restuarantorderview')}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '10px',
-            cursor: 'pointer',
-          }}
-        >
-          view orders
-        </button>
-
-      {/* Food Items List */}
-      <h2>Food Items</h2>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {foodItems.map((item) => (
-          <li
-            key={item._id}
-            style={{
-              border: '1px solid #ddd',
-              padding: '10px',
-              marginBottom: '10px',
-              borderRadius: '5px',
-            }}
-          >
-            <h3>{item.name}</h3>
-            <p>Price: ${item.price}</p>
-            <p>Description: {item.description}</p>
-            <p>Restaurant: {item.restaurant}</p>
-            <p>Availability: {item.availability}</p>
-            <button
-              onClick={() => handleAvailabilityToggle(item._id, item.availability)}
-              style={{
-                padding: '5px 10px',
-                backgroundColor: item.availability === 'Available' ? '#28a745' : '#dc3545',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginRight: '10px',
-              }}
-            >
-              {item.availability === 'Available' ? 'Mark Unavailable' : 'Mark Available'}
+      <div className="management-panel">
+        <div className="form-section">
+          <h2 className="section-title">{editItemId ? 'Edit Food Item' : 'Add New Food Item'}</h2>
+          <form onSubmit={handleSubmit} className="food-form">
+            <div className="form-group">
+              <label htmlFor="name">Food Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Enter food name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="price">Price ($)</label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                placeholder="Enter price"
+                value={formData.price}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                placeholder="Enter description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="restaurant">Restaurant Name</label>
+              <input
+                type="text"
+                id="restaurant"
+                name="restaurant"
+                placeholder="Enter restaurant name"
+                value={formData.restaurant}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <button type="submit" className="submit-button" disabled={isLoading}>
+              {isLoading ? (
+                <span className="spinner"></span>
+              ) : (
+                editItemId ? 'Update Item' : 'Add Item'
+              )}
             </button>
-            <button
-              onClick={() => handleEdit(item)}
-              style={{
-                padding: '5px 10px',
-                backgroundColor: '#ffc107',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginRight: '10px',
-              }}
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDelete(item._id)}
-              style={{
-                padding: '5px 10px',
-                backgroundColor: '#dc3545',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
-            >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
+          </form>
+        </div>
+
+        <div className="action-buttons">
+          <button onClick={() => navigate('/foodadd2')} className="nav-button">
+            Go to Food Add
+          </button>
+          <button onClick={() => navigate('/restuarantorderview')} className="nav-button">
+            View Orders
+          </button>
+        </div>
+
+        {message && (
+          <div className={`message ${message.includes('error') ? 'error' : 'success'}`}>
+            {message}
+          </div>
+        )}
+
+        <div className="food-items-section">
+          <h2 className="section-title">Your Menu Items</h2>
+          {foodItems.length === 0 ? (
+            <p className="no-items">No food items added yet</p>
+          ) : (
+            <div className="food-items-grid">
+              {foodItems.map((item) => (
+                <div key={item._id} className="food-item-card">
+                  <div className="food-item-header">
+                    <h3>{item.name}</h3>
+                    <span className={`availability-badge ${item.availability.toLowerCase()}`}>
+                      {item.availability}
+                    </span>
+                  </div>
+                  <p className="food-price">${item.price}</p>
+                  <p className="food-description">{item.description}</p>
+                  <p className="food-restaurant">{item.restaurant}</p>
+                  <div className="food-item-actions">
+                    <button
+                      onClick={() => handleAvailabilityToggle(item._id, item.availability)}
+                      className={`toggle-button ${item.availability.toLowerCase()}`}
+                      disabled={isLoading}
+                    >
+                      {item.availability === 'Available' ? 'Make Unavailable' : 'Make Available'}
+                    </button>
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="edit-button"
+                      disabled={isLoading}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      className="delete-button"
+                      disabled={isLoading}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

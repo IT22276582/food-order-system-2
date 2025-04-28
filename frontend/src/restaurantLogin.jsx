@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-
+import { useNavigate } from 'react-router-dom';
+import './styles/retaurantlogin.css';
 
 function RestaurantLogin() {
   const [formData, setFormData] = useState({
@@ -9,9 +9,9 @@ function RestaurantLogin() {
     password: '',
   });
 
-  const navigate = useNavigate(); // Initialize useNavigate
-  
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,54 +19,83 @@ function RestaurantLogin() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const response = await axios.post('http://localhost:5002/api/restaurants/login', formData);
-      const restaurantData = response.data; // userData is the full user object
-      setMessage('restaurant Login successful!');
-      localStorage.setItem('restaurant', JSON.stringify(restaurantData)); // ✅ Save to localStorage
-
-
-      
-      console.log('Restaurant Details:');
-      navigate('/food-items'); // Redirect to login page after successful registration
-
-      
+      const restaurantData = response.data;
+      setMessage('Login successful!');
+      localStorage.setItem('restaurant', JSON.stringify(restaurantData));
+      navigate('/food-items');
     } catch (err) {
       setMessage(err.response?.data?.error || 'An error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
-      <h1>Restaurant Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-header">
+          <h1 className="login-title">Restaurant Login</h1>
+          <p className="login-subtitle">Welcome back to your restaurant dashboard</p>
         </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
+
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your restaurant email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            className="login-button"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <span className="spinner"></span> Logging in...
+              </>
+            ) : (
+              'Login'
+            )}
+          </button>
+        </form>
+
+        {message && (
+          <div className={`message ${message.includes('successful') ? 'success' : 'error'}`}>
+            {message}
+          </div>
+        )}
+
+        <div className="login-footer">
+          <p>Don't have an account? <span className="register-link" onClick={() => navigate('/restaurant-register')}>Register here</span></p>
+          <p className="forgot-password">Forgot password? <span className="reset-link">Reset it</span></p>
         </div>
-        <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          Login
-        </button>
-      </form>
-      {message && <p style={{ marginTop: '20px', color: message.includes('successful') ? 'green' : 'red' }}>{message}</p>}
+      </div>
     </div>
   );
 }
