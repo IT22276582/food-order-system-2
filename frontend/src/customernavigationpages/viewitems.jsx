@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import PaymentWithStripe from '../payment'; // Import the Payment component
 
 function ViewFoodItems({ user }) {
   const [foodItems, setFoodItems] = useState([]);
-  const [orders, setOrders] = useState([]); // State to store orders
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [showPayment, setShowPayment] = useState(false); // Toggle payment gateway
+  const [orderDetails, setOrderDetails] = useState(null); // Store order details
+  const [savedOrderId, setSavedOrderId] = useState(null); // Store the saved order ID
 
   useEffect(() => {
     fetchFoodItems();
-    fetchOrders(); // Fetch existing orders on page load
+    fetchOrders();
   }, []);
 
   const fetchFoodItems = async () => {
@@ -39,40 +43,44 @@ function ViewFoodItems({ user }) {
       alert('Invalid quantity');
       return;
     }
-  
+
     const address = prompt(`Enter your address:`);
     if (!address) {
       alert('Address is required');
       return;
     }
-  
+
     const location = prompt(`Enter your location:`);
     if (!location) {
       alert('Location is required');
       return;
     }
-  
+
     try {
       const orderPayload = {
-        restaurantName: food.restaurant, 
+        restaurantName: food.restaurant,
         customerName: user.username,
-        customerAddress: address, 
-        location: location, 
+        customerAddress: address,
+        location: location,
         email: user.email,
         foodItem: {
           foodId: food._id,
           quantity: parseInt(quantity),
         },
+        amount: food.price * quantity, // Calculate total amount
       };
-  
+
+      // Save the order to the backend
       const response = await axios.post('http://localhost:5002/api/orders', orderPayload);
       setMessage(response.data.message || 'Order placed successfully!');
-      fetchOrders(); // Refresh
+      setSavedOrderId(response.data.order._id); // Store the saved order ID
+      setOrderDetails(orderPayload); // Store the order details for payment
+      setShowPayment(true); // Show the payment gateway
+      fetchOrders(); // Refresh the orders list
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to place order');
     }
   };
-  
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
@@ -85,6 +93,18 @@ function ViewFoodItems({ user }) {
       setMessage(err.response?.data?.error || 'Failed to update order status');
     }
   };
+
+  if (showPayment && orderDetails) {
+    return (
+      <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+        <h1>Payment Gateway</h1>
+        <PaymentWithStripe
+          orderId={savedOrderId} // Pass the saved order ID
+          amount={orderDetails.amount} // Pass the total amount
+        />
+      </div>
+    );
+  }
 
   if (loading) {
     return <p>Loading food items...</p>;
