@@ -147,10 +147,11 @@ function ViewFoodItems({ user }) {
             <p>Customer: {order.customerName}</p>
             <p>Address: {order.customerAddress}</p>
             <p>Location: {order.location}</p>
-            <p>email: {order.email}</p>
+            <p>Email: {order.email}</p>
             <p>Status: {order.status}</p>
             <p>Food Item: {order.foodItem.foodId.name} - Quantity: {order.foodItem.quantity}</p>
             <p>Total Amount: ${order.totalAmount}</p>
+            <p>Assigned Driver: {order.driverName || 'Not Assigned'}</p> {/* Display driver name */}
             <button
               onClick={() => handleUpdateStatus(order._id, 'Assigned')}
               style={{

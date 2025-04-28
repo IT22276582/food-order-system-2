@@ -4,10 +4,8 @@ import Order from '../models/Order.js';
 import FoodItem from '../models/FoodItem.js';
 import axios from 'axios';
 
-
 const router = express.Router();
 
-// Create a new order
 // Create a new order
 router.post('/', async (req, res) => {
   try {
@@ -40,13 +38,14 @@ router.post('/', async (req, res) => {
 
       // Check if there are available drivers
       if (data && data.length > 0) {
-        // Assign the first available driver (you can add more logic here to pick a driver based on other criteria)
+        // Assign the first available driver
         assignedDriver = data[0];
         assignedDriverId = assignedDriver._id;
 
-        // Update the driver's availability to 'Unavailable'
-        assignedDriver.availability = 'Unavailable';
-        await assignedDriver.save();
+        // Update the driver's availability to 'Unavailable' via the driver service
+        await axios.patch(`http://localhost:5001/drivers/${assignedDriverId}`, {
+          availability: 'Unavailable',
+        });
       } else {
         return res.status(404).json({ error: 'No available driver found in this location' });
       }
@@ -77,7 +76,6 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to create order', details: err.message });
   }
 });
-
 
 // Get all orders
 router.get('/', async (req, res) => {
