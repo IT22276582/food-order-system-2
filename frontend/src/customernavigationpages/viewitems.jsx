@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import PaymentWithStripe from '../payment'; // Import the Payment component
+import PaymentWithStripe from '../payment';
+import '../styles/viewfooditem.css';
 
 function ViewFoodItems({ user }) {
   const [foodItems, setFoodItems] = useState([]);
@@ -8,9 +9,10 @@ function ViewFoodItems({ user }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [showPayment, setShowPayment] = useState(false); // Toggle payment gateway
-  const [orderDetails, setOrderDetails] = useState(null); // Store order details
-  const [savedOrderId, setSavedOrderId] = useState(null); // Store the saved order ID
+  const [showPayment, setShowPayment] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [savedOrderId, setSavedOrderId] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     fetchFoodItems();
@@ -19,7 +21,7 @@ function ViewFoodItems({ user }) {
 
   const fetchFoodItems = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/food-items'); // Replace with your backend URL
+      const response = await axios.get('http://localhost:5002/api/food-items');
       setFoodItems(response.data);
       setLoading(false);
     } catch (err) {
@@ -30,7 +32,7 @@ function ViewFoodItems({ user }) {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/orders'); // Replace with your backend URL
+      const response = await axios.get('http://localhost:5002/api/orders');
       setOrders(response.data);
     } catch (err) {
       setError('Failed to fetch orders');
@@ -56,6 +58,7 @@ function ViewFoodItems({ user }) {
       return;
     }
 
+    setIsProcessing(true);
     try {
       const orderPayload = {
         restaurantName: food.restaurant,
@@ -67,143 +70,121 @@ function ViewFoodItems({ user }) {
           foodId: food._id,
           quantity: parseInt(quantity),
         },
-        amount: food.price * quantity, // Calculate total amount
+        amount: food.price * quantity,
       };
 
-      // Save the order to the backend
       const response = await axios.post('http://localhost:5002/api/orders', orderPayload);
       setMessage(response.data.message || 'Order placed successfully!');
-      setSavedOrderId(response.data.order._id); // Store the saved order ID
-      setOrderDetails(orderPayload); // Store the order details for payment
-      setShowPayment(true); // Show the payment gateway
-      fetchOrders(); // Refresh the orders list
+      setSavedOrderId(response.data.order._id);
+      setOrderDetails(orderPayload);
+      setShowPayment(true);
+      fetchOrders();
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to place order');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleUpdateStatus = async (orderId, newStatus) => {
+    setIsProcessing(true);
     try {
       const response = await axios.patch(`http://localhost:5002/api/orders/${orderId}/status`, {
         status: newStatus,
       });
       setMessage(response.data.message || 'Order status updated successfully!');
-      fetchOrders(); // Refresh the orders list after updating the status
+      fetchOrders();
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to update order status');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   if (showPayment && orderDetails) {
     return (
-      <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-        <h1>Payment Gateway</h1>
-        <PaymentWithStripe
-          orderId={savedOrderId} // Pass the saved order ID
-          amount={orderDetails.amount} // Pass the total amount
-        />
+      <div className="view-food-container">
+        <div className="view-food-card">
+          <h1>Payment Gateway</h1>
+          <PaymentWithStripe orderId={savedOrderId} amount={orderDetails.amount} />
+        </div>
       </div>
     );
   }
 
   if (loading) {
-    return <p>Loading food items...</p>;
+    return <p className="loading-message">Loading food items...</p>;
   }
 
   if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
+    return <p className="error-message">{error}</p>;
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <h1>Available Food Items</h1>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {foodItems.map((food) => (
-          <li
-            key={food._id}
-            style={{
-              border: '1px solid #ddd',
-              padding: '10px',
-              marginBottom: '10px',
-              borderRadius: '5px',
-            }}
-          >
-            <h3>{food.name}</h3>
-            <p>Price: ${food.price}</p>
-            <p>Description: {food.description}</p>
-            <p>Restaurant: {food.restaurant}</p>
-            <p>Address: {food.address}</p>
-            <p>Availability: {food.availability}</p>
-            <button
-              onClick={() => handleOrder(food)}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#007bff',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
-            >
-              Order
-            </button>
-          </li>
-        ))}
-      </ul>
+    <div className="view-food-container">
+      <div className="view-food-card">
+        <h1>Available Food Items</h1>
+        <ul className="food-items-list">
+          {foodItems.map((food) => (
+            <li key={food._id} className="food-item">
+              <h3>{food.name}</h3>
+              <p>Price: ${food.price}</p>
+              <p>Description: {food.description}</p>
+              <p>Restaurant: {food.restaurant}</p>
+              <p>Address: {food.address || 'Not specified'}</p>
+              <p>Availability: {food.availability}</p>
+              <button
+                onClick={() => handleOrder(food)}
+                className="order-button"
+                disabled={isProcessing}
+              >
+                {isProcessing ? 'Processing...' : 'Order'}
+              </button>
+            </li>
+          ))}
+        </ul>
 
-      <h2>Orders</h2>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {orders.map((order) => (
-          <li
-            key={order._id}
-            style={{
-              border: '1px solid #ddd',
-              padding: '10px',
-              marginBottom: '10px',
-              borderRadius: '5px',
-            }}
-          >
-            <h3>Order #{order._id}</h3>
-            <p>Customer: {order.customerName}</p>
-            <p>Address: {order.customerAddress}</p>
-            <p>Location: {order.location}</p>
-            <p>Email: {order.email}</p>
-            <p>Status: {order.status}</p>
-            <p>Food Item: {order.foodItem.foodId.name} - Quantity: {order.foodItem.quantity}</p>
-            <p>Total Amount: ${order.totalAmount}</p>
-            <p>Assigned Driver: {order.driverName || 'Not Assigned'}</p> {/* Display driver name */}
-            <button
-              onClick={() => handleUpdateStatus(order._id, 'Assigned')}
-              style={{
-                padding: '5px 10px',
-                backgroundColor: '#28a745',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginRight: '10px',
-              }}
-            >
-              Mark as Assigned
-            </button>
-            <button
-              onClick={() => handleUpdateStatus(order._id, 'Delivered')}
-              style={{
-                padding: '5px 10px',
-                backgroundColor: '#007bff',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
-            >
-              Mark as Delivered
-            </button>
-          </li>
-        ))}
-      </ul>
+        <h2>Orders</h2>
+        <ul className="orders-list">
+          {orders.map((order) => (
+            <li key={order._id} className="order-item">
+              <h3>Order #{order._id}</h3>
+              <p>Customer: {order.customerName}</p>
+              <p>Address: {order.customerAddress}</p>
+              <p>Location: {order.location}</p>
+              <p>Email: {order.email}</p>
+              <p>Status: {order.status}</p>
+              <p>
+                Food Item: {order.foodItem.foodId.name} - Quantity: {order.foodItem.quantity}
+              </p>
+              <p>Total Amount: ${order.totalAmount}</p>
+              <p>Assigned Driver: {order.driverName || 'Not Assigned'}</p>
+              <div className="order-actions">
+                <button
+                  onClick={() => handleUpdateStatus(order._id, 'Assigned')}
+                  className="status-button assigned"
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? 'Processing...' : 'Mark as Assigned'}
+                </button>
+                <button
+                  onClick={() => handleUpdateStatus(order._id, 'Delivered')}
+                  className="status-button delivered"
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? 'Processing...' : 'Mark as Delivered'}
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
 
-      {message && <p style={{ color: 'green', marginTop: '20px' }}>{message}</p>}
+        {message && (
+          <p className={message.includes('Failed') ? 'error-message' : 'success-message'}>
+            {message}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

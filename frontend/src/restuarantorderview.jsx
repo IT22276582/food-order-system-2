@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './styles/restaurantorderview.css';
 
 function ViewOrders() {
   const [orders, setOrders] = useState([]);
@@ -13,11 +14,11 @@ function ViewOrders() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/orders'); // Replace with your backend URL
+      const response = await axios.get('http://localhost:5002/api/orders');
       setOrders(response.data);
       setLoading(false);
     } catch (err) {
-      setError('Failed to fetch orders');
+      setError('Failed to fetch orders. Please try again later.');
       setLoading(false);
     }
   };
@@ -28,63 +29,89 @@ function ViewOrders() {
         status: newStatus,
       });
       setMessage(response.data.message || 'Order status updated successfully!');
-      fetchOrders(); // Refresh the orders list after updating the status
+      fetchOrders();
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to update order status');
     }
   };
 
   if (loading) {
-    return <p>Loading orders...</p>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading orders...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
+    return <div className="error-message">{error}</div>;
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <h1>Orders</h1>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {orders.map((order) => (
-          <li
-            key={order._id}
-            style={{
-              border: '1px solid #ddd',
-              padding: '10px',
-              marginBottom: '10px',
-              borderRadius: '5px',
-            }}
-          >
-            <h3>Order #{order._id}</h3>
-            <p>Customer: {order.customerName}</p>
-            <p>Address: {order.customerAddress}</p>
-            <p>Location: {order.location}</p>
-            <p>Email: {order.email}</p>
+    <div className="orders-dashboard">
+      <div className="orders-header">
+        <h1>Order Management</h1>
+        <p className="orders-subtitle">View and manage customer orders</p>
+      </div>
 
-            <p>Status: {order.status}</p>
-            <p>Food Item: {order.foodItem.foodId.name} - Quantity: {order.foodItem.quantity}</p>
-            <p>Total Amount: ${order.totalAmount}</p>
-            <button
-              onClick={() => handleUpdateStatus(order._id, 'Assigned')}
-              style={{
-                padding: '5px 10px',
-                backgroundColor: '#28a745',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginRight: '10px',
-              }}
-            >
-              Mark as Assigned
-            </button>
-           
-          </li>
-        ))}
-      </ul>
+      {message && (
+        <div className={`message ${message.includes('Failed') ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      )}
 
-      {message && <p style={{ color: 'green', marginTop: '20px' }}>{message}</p>}
+      <div className="orders-grid">
+        {orders.length === 0 ? (
+          <div className="no-orders">
+            <p>No orders found</p>
+          </div>
+        ) : (
+          orders.map((order) => (
+            <div key={order._id} className="order-card">
+              <div className="order-header">
+                <h3>Order #{order._id.slice(-6).toUpperCase()}</h3>
+                <span className={`status-badge ${order.status.toLowerCase()}`}>
+                  {order.status}
+                </span>
+              </div>
+
+              <div className="order-details">
+                <div className="customer-info">
+                  <h4>Customer Details</h4>
+                  <p><strong>Name:</strong> {order.customerName}</p>
+                  <p><strong>Email:</strong> {order.email}</p>
+                  <p><strong>Address:</strong> {order.customerAddress}</p>
+                  <p><strong>Location:</strong> {order.location}</p>
+                </div>
+
+                <div className="order-items">
+                  <h4>Order Items</h4>
+                  <div className="food-item">
+                    <p><strong>{order.foodItem.foodId.name}</strong></p>
+                    <p>Quantity: {order.foodItem.quantity}</p>
+                  </div>
+                </div>
+
+                <div className="order-summary">
+                  <p className="total-amount">Total: ${order.totalAmount.toFixed(2)}</p>
+                </div>
+              </div>
+
+              <div className="order-actions">
+                {order.status !== 'Assigned' && (
+                  <button
+                    onClick={() => handleUpdateStatus(order._id, 'Assigned')}
+                    className="assign-button"
+                  >
+                    Assign to Driver
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

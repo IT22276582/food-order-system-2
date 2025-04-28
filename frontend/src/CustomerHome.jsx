@@ -1,11 +1,10 @@
 import React from 'react';
-import { Link, Route, Routes,useLocation } from 'react-router-dom';
+import { Link, Route, Routes, useLocation,Navigate } from 'react-router-dom';
 import Orders from './customernavigationpages/Orders';
 import ViewOrders from './customernavigationpages/ViewOrders';
 import EditProfile from './customernavigationpages/EditProfile';
 import Viewitems from './customernavigationpages/viewitems';
-
-
+import './styles/customerhom.css';
 
 function CustomerHome() {
     const location = useLocation();
@@ -13,78 +12,46 @@ function CustomerHome() {
     if (!user) {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-          user = JSON.parse(storedUser);
+            user = JSON.parse(storedUser);
         }
-      }
-  return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-    <h1>Welcome, {user?.username || "Guest"}!</h1>
-    <p>Email: {user?.email || "No Email Available"}</p>
-      {/* Navigation Bar */}
-      <nav
-        style={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          backgroundColor: '#007bff',
-          padding: '10px',
-          borderRadius: '5px',
-        }}
-      >
-        <Link
-          to="/customerHome/orders"
-          style={{
-            color: '#fff',
-            textDecoration: 'none',
-            fontWeight: 'bold',
-          }}
-        >
-          Orders
-        </Link>
-        <Link
-          to="/customerHome/view-orders"
-          style={{
-            color: '#fff',
-            textDecoration: 'none',
-            fontWeight: 'bold',
-          }}
-        >
-          View Orders
-        </Link>
-        <Link
-          to="/customerHome/edit-profile"
-          style={{
-            color: '#fff',
-            textDecoration: 'none',
-            fontWeight: 'bold',
-          }}
-        >
-          Edit Profile
-        </Link>
-        
-        <Link
-          to="/customerHome/view-items"
-          style={{
-            color: '#fff',
-            textDecoration: 'none',
-            fontWeight: 'bold',
-          }}
-        >
-          View-items
-        </Link>
-      </nav>
+    }
 
-      {/* Routes */}
-      <div style={{ marginTop: '20px' }}>
-        <Routes>
-          <Route path="orders" element={<Orders user={user} />} />
-          <Route path="view-orders" element={<ViewOrders user={user} />} />
-          <Route path="edit-profile" element={<EditProfile user={user} />} />
-          <Route path="view-items" element={<Viewitems user={user} />} />
+    return (
+        <div className="customer-dashboard">
+            <div className="dashboard-header">
+                <div className="user-welcome">
+                    <h1>Welcome back, <span className="username">{user?.username || "Guest"}</span>!</h1>
+                    <p className="user-email">{user?.email || "No email available"}</p>
+                </div>
+            </div>
 
-        </Routes>
-      </div>
-    </div>
-  );
+            <nav className="dashboard-nav">
+                
+                <Link to="/customerHome/view-orders" className="nav-link">
+                    <span className="nav-icon">📋</span>
+                    <span className="nav-text">My Orders</span>
+                </Link>
+                <Link to="/customerHome/edit-profile" className="nav-link">
+                    <span className="nav-icon">👤</span>
+                    <span className="nav-text">Profile</span>
+                </Link>
+                <Link to="/customerHome/view-items" className="nav-link">
+                    <span className="nav-icon">🍽️</span>
+                    <span className="nav-text">Menu</span>
+                </Link>
+            </nav>
+
+            <div className="dashboard-content">
+                <Routes>
+                    <Route path="/" element={<Navigate to="/customerHome/view-items" replace />} />
+
+                    <Route path="view-orders" element={<ViewOrders user={user} />} />
+                    <Route path="edit-profile" element={<EditProfile user={user} />} />
+                    <Route path="view-items" element={<Viewitems user={user} />} />
+                </Routes>
+            </div>
+        </div>
+    );
 }
 
 export default CustomerHome;
