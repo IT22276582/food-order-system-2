@@ -236,7 +236,7 @@ router.post('/', async (req, res) => {
 
     // Send order confirmation notification
     try {
-      await axios.post('http://localhost:3000/api/notifications/order-confirmation', {
+      await axios.post('http://localhost:3003/notify/order-confirmation', {
         customerEmail: email,
         orderDetails: {
           orderId: order._id.toString(),
@@ -246,7 +246,7 @@ router.post('/', async (req, res) => {
       });
 
       // Update the driver assignment notification with the orderId
-      await axios.post('http://localhost:3000/api/notifications/delivery-assignment', {
+      await axios.post('http://localhost:3003/notify/delivery-assignment', {
         driverEmail: assignedDriver.email,
         orderDetails: {
           orderId: order._id.toString(),
