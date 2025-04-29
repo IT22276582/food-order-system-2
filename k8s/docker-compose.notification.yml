@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+  login-service:
+    build: ../notification-backend
+    ports:
+      - "3003:3003"
+    env_file:
+      - ../notification-backend/.env 
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/logindb
+      - PORT=5000
+    depends_on:
+      - mongo
+volumes:
+  mongo-data:
