@@ -15,7 +15,7 @@ function ViewOrders() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/orders');
+      const response = await axios.get('http://localhost:5004/api/orders');
       setOrders(response.data);
       setLoading(false);
     } catch (err) {
@@ -27,7 +27,7 @@ function ViewOrders() {
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
       const response = await axios.patch(
-        `http://localhost:5002/api/orders/${orderId}/status`,
+        `http://localhost:5004/api/orders/${orderId}/status`,
         { status: newStatus }
       );
       setMessage(response.data.message || 'Order status updated successfully!');

@@ -32,7 +32,7 @@ function ViewFoodItems({ user }) {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/orders');
+      const response = await axios.get('http://localhost:5004/api/orders');
       setOrders(response.data);
     } catch (err) {
       setError('Failed to fetch orders');
@@ -73,7 +73,7 @@ function ViewFoodItems({ user }) {
         amount: food.price * quantity,
       };
 
-      const response = await axios.post('http://localhost:5002/api/orders', orderPayload);
+      const response = await axios.post('http://localhost:5004/api/orders', orderPayload);
       setMessage(response.data.message || 'Order placed successfully!');
       setSavedOrderId(response.data.order._id);
       setOrderDetails(orderPayload);
@@ -89,7 +89,7 @@ function ViewFoodItems({ user }) {
   const handleUpdateStatus = async (orderId, newStatus) => {
     setIsProcessing(true);
     try {
-      const response = await axios.patch(`http://localhost:5002/api/orders/${orderId}/status`, {
+      const response = await axios.patch(`http://localhost:5004/api/orders/${orderId}/status`, {
         status: newStatus,
       });
       setMessage(response.data.message || 'Order status updated successfully!');

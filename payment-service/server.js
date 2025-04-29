@@ -10,7 +10,7 @@ dotenv.config();
 console.log('STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY);
 
 const app = express();
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 5005;
 
 // Middleware
 app.use(cors());

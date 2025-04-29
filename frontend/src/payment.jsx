@@ -27,7 +27,7 @@ const Payment = ({ orderId, amount }) => {
 
     try {
       // Step 1: Initiate payment
-      const response = await fetch('http://localhost:3003/api/payments/initiate', {
+      const response = await fetch('http://localhost:5005/api/payments/initiate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ const Payment = ({ orderId, amount }) => {
       }
 
       // Step 3: Confirm payment on backend
-      const confirmResponse = await fetch('http://localhost:3003/api/payments/confirm', {
+      const confirmResponse = await fetch('http://localhost:5005/api/payments/confirm', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

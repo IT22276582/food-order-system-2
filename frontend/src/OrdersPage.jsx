@@ -32,7 +32,7 @@ function OrdersPage() {
   // Fetch all orders
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/orders');
+      const response = await axios.get('http://localhost:5004/api/orders');
       setOrders(response.data);
     } catch (err) {
       console.error('Error fetching orders:', err.message);
@@ -72,7 +72,7 @@ function OrdersPage() {
         totalAmount,
       };
 
-      const response = await axios.post('http://localhost:5002/api/orders', newOrder);
+      const response = await axios.post('http://localhost:5004/api/orders', newOrder);
       setMessage(response.data.message || 'Order placed successfully!');
       setSelectedFood(null);
       setCustomerDetails({
