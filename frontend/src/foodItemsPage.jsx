@@ -131,7 +131,7 @@ function FoodItemsPage() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="price">Price ($)</label>
+              <label htmlFor="price">Price (LKR)</label>
               <input
                 type="number"
                 id="price"
@@ -204,7 +204,7 @@ function FoodItemsPage() {
                       {item.availability}
                     </span>
                   </div>
-                  <p className="food-price">${item.price}</p>
+                  <p className="food-price">LKR {item.price}</p>
                   <p className="food-description">{item.description}</p>
                   <p className="food-restaurant">{item.restaurant}</p>
                   <div className="food-item-actions">
