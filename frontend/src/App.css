@@ -67,3 +67,121 @@ body {
 .nav-button:hover {
   background: #0056b3;
 }
+
+/* Base Styles */
+.home-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+}
+
+.welcome-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 1000px;
+  width: 100%;
+  text-align: center;
+}
+
+.welcome-title {
+  color: #2c3e50;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.welcome-subtitle {
+  color: #7f8c8d;
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+}
+
+.role-cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.role-card {
+  flex: 1;
+  min-width: 250px;
+  max-width: 300px;
+  background: white;
+  border-radius: 12px;
+  padding: 30px 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.role-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.role-card h3 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.role-card p {
+  color: #7f8c8d;
+  margin-bottom: 20px;
+  min-height: 50px;
+}
+
+.card-button {
+  background: #3498db;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.driver-card .card-button {
+  background: #e74c3c;
+}
+
+.customer-card .card-button {
+  background: #2ecc71;
+}
+
+.restaurant-card .card-button {
+  background: #f39c12;
+}
+
+.role-card:hover .card-button {
+  background: #2c3e50;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .role-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .role-card {
+    width: 100%;
+    max-width: 350px;
+  }
+  
+  .welcome-title {
+    font-size: 2rem;
+  }
+}

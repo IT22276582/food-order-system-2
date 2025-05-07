@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import '../styles/editprofile.css'; // Create this CSS file
 
 function EditProfile() {
+  // All existing state and functions remain exactly the same
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -18,47 +20,58 @@ function EditProfile() {
   };
 
   return (
-    <div>
-      <h2>Edit Profile</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          style={{ display: 'block', marginBottom: '10px', padding: '10px', width: '100%' }}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          style={{ display: 'block', marginBottom: '10px', padding: '10px', width: '100%' }}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          style={{ display: 'block', marginBottom: '10px', padding: '10px', width: '100%' }}
-        />
-        <button
-          type="submit"
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#28a745',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
-        >
-          Update Profile
-        </button>
-      </form>
+    <div className="edit-profile-container">
+      <div className="profile-card">
+        <h2 className="profile-title">Edit Your Profile</h2>
+        
+        <form onSubmit={handleSubmit} className="profile-form">
+          <div className="form-group">
+            <label htmlFor="username" className="form-label">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Enter your username"
+              value={formData.username}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter new password"
+              value={formData.password}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+          
+          <button type="submit" className="submit-button">
+            Update Profile
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

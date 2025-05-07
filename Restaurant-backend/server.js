@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import foodItemRoutes from './routes/foodItemRoutes.js';
-import orderRoutes from './routes/orderRoutes.js'; // Import order routes
+// import orderRoutes from './routes/orderRoutes.js'; // Import order routes
 import restaurantAuthRoutes from './routes/restaurantAuthRoutes.js';
 
 
@@ -25,7 +25,7 @@ mongoose.connect(process.env.MONGO_URI, {
 // Routes
 app.use('/api/food-items', foodItemRoutes);
 app.use('/api/restaurants', restaurantAuthRoutes);
-app.use('/api/orders', orderRoutes); // Add order routes
+// app.use('/api/orders', orderRoutes); // Add order routes
 
 
 // Start the server

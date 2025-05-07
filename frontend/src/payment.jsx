@@ -1,10 +1,13 @@
+// frontend/src/components/Payment.js
 import React, { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
+
+// Initialize Stripe with your test publishable key
 const stripePromise = loadStripe('pk_test_51RHVjYRkJVGAQsLmxIW828RE2KRcUDpGPy1Mf2qUkdCui2iS7ObS57XIU8pH1f79TLyjnNCLIqkD1jTznMBkjaet000NLyONRz');
 
-const Payment = ({ orderId, amount, onSuccess }) => {
+const Payment = ({ orderId, amount }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState(null);
@@ -13,29 +16,18 @@ const Payment = ({ orderId, amount, onSuccess }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log('Starting payment for:', { orderId, amount });
     setProcessing(true);
     setError(null);
 
     if (!stripe || !elements) {
-      console.error('Stripe or Elements not loaded');
       setError('Stripe has not loaded. Please try again.');
-      setProcessing(false);
-      return;
-    }
-
-    const cardElement = elements.getElement(CardElement);
-    if (!cardElement) {
-      console.error('CardElement not found');
-      setError('Card input not found. Please refresh and try again.');
       setProcessing(false);
       return;
     }
 
     try {
       // Step 1: Initiate payment
-      console.log('Sending request to /api/payments/initiate');
-      const response = await fetch('http://localhost:3003/api/payments/initiate', {
+      const response = await fetch('http://localhost:5005/api/payments/initiate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,38 +35,30 @@ const Payment = ({ orderId, amount, onSuccess }) => {
         body: JSON.stringify({ orderId, amount, currency: 'lkr' }),
       });
 
-      console.log('Initiate response status:', response.status);
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Initiate error:', errorData);
-        throw new Error(`Failed to initiate payment: ${errorData.error || response.statusText}`);
+        throw new Error('Failed to initiate payment');
       }
 
       const { clientSecret, paymentIntentId } = await response.json();
-      console.log('Received:', { clientSecret, paymentIntentId });
 
       // Step 2: Confirm payment with Stripe
-      console.log('Confirming payment with Stripe');
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
-          card: cardElement,
+          card: elements.getElement(CardElement),
           billing_details: {
-            name: 'Test Customer',
+            name: 'Test Customer', // Optional: Customize based on your app
           },
         },
       });
 
-      console.log('Confirm result:', result);
       if (result.error) {
-        console.error('Confirm error:', result.error.message);
         setError(result.error.message);
         setProcessing(false);
         return;
       }
 
       // Step 3: Confirm payment on backend
-      console.log('Sending confirm request to /api/payments/confirm');
-      const confirmResponse = await fetch('http://localhost:3003/api/payments/confirm', {
+      const confirmResponse = await fetch('http://localhost:5005/api/payments/confirm', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,19 +67,12 @@ const Payment = ({ orderId, amount, onSuccess }) => {
       });
 
       if (!confirmResponse.ok) {
-        const confirmError = await confirmResponse.json();
-        console.error('Confirm backend error:', confirmError);
-        throw new Error(`Failed to confirm payment: ${confirmError.error || confirmResponse.statusText}`);
+        throw new Error('Failed to confirm payment');
       }
 
-      console.log('Payment confirmed successfully');
       setSuccess(true);
       setProcessing(false);
-      if (onSuccess) {
-        onSuccess();
-      }
     } catch (error) {
-      console.error('Payment error:', error.message);
       setError(error.message || 'Payment failed');
       setProcessing(false);
     }
@@ -125,7 +102,7 @@ const Payment = ({ orderId, amount, onSuccess }) => {
   );
 };
 
-// Inline styles
+// Inline styles (replace with CSS file or Tailwind if used by your group)
 const styles = {
   container: {
     maxWidth: '400px',

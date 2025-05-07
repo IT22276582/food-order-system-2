@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-
+import { useNavigate } from 'react-router-dom';
+import './styles/restaurantregister.css';
 
 function RestaurantRegister() {
   const [formData, setFormData] = useState({
@@ -10,10 +10,9 @@ function RestaurantRegister() {
     password: '',
     address: '',
   });
-
-  const navigate = useNavigate(); // Initialize useNavigate
-
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,73 +20,88 @@ function RestaurantRegister() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const response = await axios.post('http://localhost:5002/api/restaurants/register', formData);
       setMessage(response.data.message);
-      navigate('/restaurant-login'); // Redirect to login page after successful registration
-
+      navigate('/restaurant-login');
     } catch (err) {
       setMessage(err.response?.data?.error || 'An error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
-  const handlelogin = () => {
-    navigate("/restaurant-login")
-  }
+
+  const handleLogin = () => {
+    navigate('/restaurant-login');
+  };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
-      <h1>Register Your Restaurant</h1>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Restaurant Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="text"
-            name="address"
-            placeholder="Address"
-            value={formData.address}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
-        </div>
-        <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          Register
+    <div className="register-container">
+      <div className="register-card">
+        <h1>Register Your Restaurant</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Restaurant Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Enter restaurant name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="address">Address</label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              placeholder="Enter address"
+              value={formData.address}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" className="register-button" disabled={isLoading}>
+            {isLoading ? 'Registering...' : 'Register'}
+          </button>
+        </form>
+        <button onClick={handleLogin} className="login-button">
+          Already have an account? Login
         </button>
-      </form>
-      <button onClick={handlelogin}>Login</button>
-      {message && <p style={{ marginTop: '20px', color: 'green' }}>{message}</p>}
+        {message && (
+          <p className={message.includes('error') ? 'error-message' : 'success-message'}>
+            {message}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

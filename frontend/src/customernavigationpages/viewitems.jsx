@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PaymentWithStripe from '../payment';
+import '../styles/viewfooditem.css';
 
 function ViewFoodItems({ user }) {
   const [foodItems, setFoodItems] = useState([]);
-  const [orders, setOrders] = useState([]); // State to store orders
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [paymentOrder, setPaymentOrder] = useState(null); // State to store the order for payment
+  const [showPayment, setShowPayment] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [savedOrderId, setSavedOrderId] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     fetchFoodItems();
-    fetchOrders(); // Fetch existing orders on page load
+    fetchOrders();
   }, []);
 
   const fetchFoodItems = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/food-items'); // Replace with your backend URL
+      const response = await axios.get('http://localhost:5002/api/food-items');
       setFoodItems(response.data);
       setLoading(false);
     } catch (err) {
@@ -28,7 +32,7 @@ function ViewFoodItems({ user }) {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/orders'); // Replace with your backend URL
+      const response = await axios.get('http://localhost:5004/api/orders');
       setOrders(response.data);
     } catch (err) {
       setError('Failed to fetch orders');
@@ -41,202 +45,176 @@ function ViewFoodItems({ user }) {
       alert('Invalid quantity');
       return;
     }
-  
+
     const address = prompt(`Enter your address:`);
     if (!address) {
       alert('Address is required');
       return;
     }
-  
+
     const location = prompt(`Enter your location:`);
     if (!location) {
       alert('Location is required');
       return;
     }
-  
+
+    setIsProcessing(true);
     try {
       const orderPayload = {
-        restaurantName: food.restaurant, 
+        restaurantName: food.restaurant,
         customerName: user.username,
-        customerAddress: address, 
-        location: location, 
+        customerAddress: address,
+        location: location,
         email: user.email,
         foodItem: {
           foodId: food._id,
           quantity: parseInt(quantity),
         },
+        amount: food.price * quantity,
       };
-  
-      const response = await axios.post('http://localhost:5002/api/orders', orderPayload);
-      setMessage(response.data.message || 'Order placed successfully!');
 
-      // payment related start
-      // Store order details for payment
-      const order = response.data.order || { _id: response.data._id, totalAmount: food.price * quantity };
-      setPaymentOrder({
-        orderId: order._id,
-        totalAmount: order.totalAmount || food.price * quantity, // Fallback to calculated amount
-      });
-      // payment related end
-      fetchOrders(); // Refresh
+      const response = await axios.post('http://localhost:5004/api/orders', orderPayload);
+      setMessage(response.data.message || 'Order placed successfully!');
+      setSavedOrderId(response.data.order._id);
+      setOrderDetails(orderPayload);
+      setShowPayment(true);
+      fetchOrders();
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to place order');
+    } finally {
+      setIsProcessing(false);
     }
   };
-  
 
   const handleUpdateStatus = async (orderId, newStatus) => {
+    setIsProcessing(true);
     try {
-      const response = await axios.patch(`http://localhost:5002/api/orders/${orderId}/status`, {
+      const response = await axios.patch(`http://localhost:5004/api/orders/${orderId}/status`, {
         status: newStatus,
       });
       setMessage(response.data.message || 'Order status updated successfully!');
-      fetchOrders(); // Refresh the orders list after updating the status
+      fetchOrders();
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to update order status');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  // payment related start
-
-  const handlePaymentSuccess = () => {
-    setMessage('Payment successful!');
-    setPaymentOrder(null); // Return to food items
-    fetchOrders(); // Refresh orders
-  };
-
-  const handlePaymentCancel = () => {
-    setPaymentOrder(null); // Return to food items
-    setMessage('Payment cancelled');
-  };
-
-  // payment related end
-
+  if (showPayment && orderDetails) {
+    return (
+      <div className="view-food-container">
+        <div className="view-food-card">
+          <h1>Payment Gateway</h1>
+          <PaymentWithStripe orderId={savedOrderId} amount={orderDetails.amount} />
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
-    return <p>Loading food items...</p>;
+    return <p className="loading-message">Loading food items...</p>;
   }
 
   if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
+    return <p className="error-message">{error}</p>;
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      {paymentOrder ? (
-        <div>
-          <h2>Complete Payment for Order #{paymentOrder.orderId}</h2>
-          <PaymentWithStripe
-            orderId={paymentOrder.orderId}
-            amount={paymentOrder.totalAmount}
-            onSuccess={handlePaymentSuccess}
-          />
-          <button
-            onClick={handlePaymentCancel}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#dc3545',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              marginTop: '20px',
-            }}
-          >
-            Cancel Payment
-          </button>
-        </div>
-      ) : (
-        <>
-          <h1>Available Food Items</h1>
-          <ul style={{ listStyleType: 'none', padding: 0 }}>
-            {foodItems.map((food) => (
-              <li
-                key={food._id}
-                style={{
-                  border: '1px solid #ddd',
-                  padding: '10px',
-                  marginBottom: '10px',
-                  borderRadius: '5px',
-                }}
-              >
+    <div className="view-food-container">
+      <div className="view-food-card">
+        <h1 className="section-title">Available Food Items</h1>
+        
+        <div className="food-items-grid">
+          {foodItems.map((food) => (
+            <div key={food._id} className="food-item-card">
+              <div className="food-header">
                 <h3>{food.name}</h3>
-                <p>Price: ${food.price}</p>
-                <p>Description: {food.description}</p>
-                <p>Restaurant: {food.restaurant}</p>
-                <p>Address: {food.address}</p>
-                <p>Availability: {food.availability}</p>
-                <button
-                  onClick={() => handleOrder(food)}
-                  style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#007bff',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Order
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          <h2>Orders</h2>
-          <ul style={{ listStyleType: 'none', padding: 0 }}>
-            {orders.map((order) => (
-              <li
-                key={order._id}
-                style={{
-                  border: '1px solid #ddd',
-                  padding: '10px',
-                  marginBottom: '10px',
-                  borderRadius: '5px',
-                }}
+                <span className={`availability ${food.availability.toLowerCase()}`}>
+                  {food.availability}
+                </span>
+              </div>
+              <p className="price">${food.price.toFixed(2)}</p>
+              <p className="description">{food.description}</p>
+              <div className="restaurant-info">
+                <p><strong>{food.restaurant}</strong></p>
+                <p>{food.address || 'Address not specified'}</p>
+              </div>
+              <button
+                onClick={() => handleOrder(food)}
+                className="order-button"
+                disabled={isProcessing}
               >
-                <h3>Order #{order._id}</h3>
-                <p>Customer: {order.customerName}</p>
-                <p>Address: {order.customerAddress}</p>
-                <p>Location: {order.location}</p>
-                <p>Email: {order.email}</p>
-                <p>Status: {order.status}</p>
-                <p>Food Item: {order.foodItem.foodId.name} - Quantity: {order.foodItem.quantity}</p>
-                <p>Total Amount: ${order.totalAmount}</p>
-                <button
-                  onClick={() => handleUpdateStatus(order._id, 'Assigned')}
-                  style={{
-                    padding: '5px 10px',
-                    backgroundColor: '#28a745',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    marginRight: '10px',
-                  }}
-                >
-                  Mark as Assigned
-                </button>
-                <button
-                  onClick={() => handleUpdateStatus(order._id, 'Delivered')}
-                  style={{
-                    padding: '5px 10px',
-                    backgroundColor: '#007bff',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Mark as Delivered
-                </button>
-              </li>
-            ))}
-          </ul>
+                {isProcessing ? (
+                  <>
+                    <span className="spinner"></span> Processing...
+                  </>
+                ) : (
+                  'Place Order'
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
 
-          {message && <p style={{ color: 'green', marginTop: '20px' }}>{message}</p>}
-        </>
-      )}
+        <h2 className="section-title">Your Orders</h2>
+        
+        <div className="orders-grid">
+          {orders.length === 0 ? (
+            <p className="no-orders">No orders found</p>
+          ) : (
+            orders.map((order) => (
+              <div key={order._id} className="order-card">
+                <div className="order-header">
+                  <h3>Order #{order._id.slice(-6)}</h3>
+                  <span className={`status ${order.status.toLowerCase()}`}>
+                    {order.status}
+                  </span>
+                </div>
+                
+                <div className="order-details">
+                  <div className="customer-info">
+                    <p><strong>Customer:</strong> {order.customerName}</p>
+                    <p><strong>Email:</strong> {order.email}</p>
+                    <p><strong>Address:</strong> {order.customerAddress}</p>
+                    <p><strong>Location:</strong> {order.location}</p>
+                  </div>
+                  
+                  <div className="order-items">
+                    <p><strong>Item:</strong> {order.foodItem.foodId.name}</p>
+                    <p><strong>Quantity:</strong> {order.foodItem.quantity}</p>
+                    <p><strong>Total:</strong> ${order.totalAmount.toFixed(2)}</p>
+                    <p><strong>Driver:</strong> {order.driverName || 'Not assigned'}</p>
+                  </div>
+                </div>
+                
+                <div className="order-actions">
+                  <button
+                    onClick={() => handleUpdateStatus(order._id, 'Assigned')}
+                    className="status-button assign"
+                    disabled={isProcessing}
+                  >
+                    {isProcessing ? 'Processing...' : 'Assign Driver'}
+                  </button>
+                  <button
+                    onClick={() => handleUpdateStatus(order._id, 'Delivered')}
+                    className="status-button deliver"
+                    disabled={isProcessing}
+                  >
+                    {isProcessing ? 'Processing...' : 'Mark Delivered'}
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {message && (
+          <div className={`message ${message.includes('Failed') ? 'error' : 'success'}`}>
+            {message}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
