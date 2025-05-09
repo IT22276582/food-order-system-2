@@ -24,7 +24,7 @@ function DriverRegister() {
     try {
       const response = await axios.post('http://localhost:5001/drivers', formData);
       alert(response.data.message);
-      fetchDrivers();
+      handleNavigateToLogin();
     } catch (err) {
       alert('Error: ' + (err.response?.data?.error || err.message));
     }

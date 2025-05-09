@@ -19,7 +19,10 @@ function DriverLogin() {
     try {
       const response = await axios.post('http://localhost:5001/drivers/login', formData);
       alert('Login successful!');
-      navigate('/driver-home', { state: { driverId: response.data.driver._id } });
+      const token = response.data.token;
+      const driver = response.data.driver;
+      console.log('DriverID:', driver._id);
+      navigate('/driver-home', { state: { token, driver } });
     } catch (err) {
       setMessage(err.response?.data?.error || 'Login failed. Please try again.');
     }

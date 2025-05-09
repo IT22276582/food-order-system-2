@@ -85,6 +85,7 @@ export const updateDriver = async (req, res) => {
     res.json({ message: 'Driver updated successfully', driver });
   } catch (err) {
     res.status(500).json({ error: 'Error updating driver', details: err.message });
+    console.log(err);
   }
 };
 
