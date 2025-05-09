@@ -186,7 +186,7 @@ function FoodItemsPage() {
                   </div>
                   <p className="food-price">${item.price}</p>
                   <p className="food-description">{item.description}</p>
-                  <p className="food-restaurant">{item.restaurant}</p>
+                  <p className="food-restaurant">{item.restaurant.name}</p>
                   <div className="food-item-actions">
                     <button
                       onClick={() => handleAvailabilityToggle(item._id, item.availability)}

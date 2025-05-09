@@ -26,21 +26,21 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-
-// Get all food items
-// router.get('/', async (req, res) => {
-//   try {
-//     const foodItems = await FoodItem.find();
-//     res.json(foodItems);
-//   } catch (err) {
-//     res.status(500).json({ error: 'Failed to fetch food items', details: err.message });
-//   }
-// });
-// Get all food items
+// Get all food items for a restaurant
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const restaurantId = req.restaurant.id;
-    const foodItems = await FoodItem.find({ restaurant: restaurantId });
+    const foodItems = await FoodItem.find({ restaurant: restaurantId }).populate('restaurant');
+    res.json(foodItems);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch food items', details: err.message });
+  }
+});
+
+// Get all food items (for admin or public view)
+router.get('/all', async (req, res) => {
+  try {
+    const foodItems = await FoodItem.find().populate('restaurant');
     res.json(foodItems);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch food items', details: err.message });
@@ -112,5 +112,7 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete food item', details: err.message });
   }
 });
+
+
 
 export default router;
