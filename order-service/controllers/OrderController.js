@@ -12,10 +12,11 @@ const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http:/
 class OrderController {
   static async createOrder(req, res) {
     try {
-      const { restaurantName, customerName, customerAddress, location, email, foodItem } = req.body;
+      const { restaurantName, customerName, customerAddress, location, email, foodItem, amount } = req.body;
+      const token = req.headers.authorization; // Get token from headers
 
       // Validate required fields
-      if (!restaurantName || !customerName || !customerAddress || !location || !email || !foodItem) {
+      if (!restaurantName || !customerName || !customerAddress || !location || !foodItem) {
         return res.status(400).json({ error: 'All fields are required' });
       }
 
@@ -31,43 +32,53 @@ class OrderController {
         return res.status(404).json({ error: 'Food item not available' });
       }
 
-      // Calculate total amount
-      const totalAmount = food.price * foodItem.quantity;
+      // Validate amount
+      const calculatedAmount = food.price * foodItem.quantity * 300; // Convert to LKR
+      if (amount !== calculatedAmount) {
+        return res.status(400).json({ error: 'Invalid amount', expected: calculatedAmount, received: amount });
+      }
 
       let assignedDriverId = null;
       let assignedDriver = null;
 
       try {
         // Get driver from Driver Service
-        const { data } = await axios.get(`${DRIVER_SERVICE_URL}/drivers/location/${location}`);
+        const { data } = await axios.get(`${DRIVER_SERVICE_URL}/drivers/location/${location}`, {
+          headers: { Authorization: token },
+        });
         if (data && data.length > 0) {
           assignedDriver = data[0];
           assignedDriverId = assignedDriver._id;
 
           // Update driver availability
-          await axios.patch(`${DRIVER_SERVICE_URL}/drivers/${assignedDriverId}`, {
-            availability: 'Unavailable',
-          });
+          await axios.patch(
+            `${DRIVER_SERVICE_URL}/drivers/${assignedDriverId}`,
+            { availability: 'Unavailable' },
+            { headers: { Authorization: token } }
+          );
 
           // Send driver assignment notification
           try {
-            await axios.post(`${NOTIFICATION_SERVICE_URL}/notify/delivery-assignment`, {
-              driverEmail: assignedDriver.email,
-              orderDetails: {
-                orderId: null, // Updated after order save
-                customerName,
-                address: customerAddress,
+            await axios.post(
+              `${NOTIFICATION_SERVICE_URL}/notify/delivery-assignment`,
+              {
+                driverEmail: assignedDriver.email,
+                orderDetails: {
+                  orderId: null, // Updated after order save
+                  customerName,
+                  address: customerAddress,
+                },
               },
-            });
+              { headers: { Authorization: token } }
+            );
           } catch (notificationError) {
             console.error('Failed to send driver assignment notification:', notificationError.response?.data || notificationError.message);
           }
-        } else {
-          return res.status(404).json({ error: 'No available driver found in this location' });
         }
       } catch (error) {
-        console.error('Error fetching driver or assigning driver:', error);
-        return res.status(500).json({ error: 'Error assigning driver', details: error.message });
+        console.error('Error fetching driver or assigning driver:', error.response?.data || error.message);
+        // Continue without driver assignment for viva
+        console.warn('Proceeding without driver assignment due to error');
       }
 
       // Create the order
@@ -79,8 +90,8 @@ class OrderController {
         email,
         foodItem,
         assignedDriver: assignedDriverId,
-        driverName: assignedDriver.name,
-        totalAmount,
+        driverName: assignedDriver ? assignedDriver.name : 'Not assigned',
+        totalAmount: amount,
         status: 'Pending',
       });
 
@@ -89,41 +100,60 @@ class OrderController {
 
       // Send order confirmation notification
       try {
-        await axios.post(`${NOTIFICATION_SERVICE_URL}/notify/order-confirmation`, {
-          customerEmail: email,
-          orderDetails: {
-            orderId: order._id.toString(),
-            total: totalAmount,
+        await axios.post(
+          `${NOTIFICATION_SERVICE_URL}/notify/order-confirmation`,
+          {
+            customerEmail: email,
+            orderDetails: {
+              orderId: order._id.toString(),
+              total: amount,
+            },
           },
-        });
+          { headers: { Authorization: token } }
+        );
 
         // Update driver assignment notification with orderId
-        await axios.post(`${NOTIFICATION_SERVICE_URL}/notify/delivery-assignment`, {
-          driverEmail: assignedDriver.email,
-          orderDetails: {
-            orderId: order._id.toString(),
-            customerName,
-            address: customerAddress,
-          },
-        });
+        if (assignedDriver) {
+          await axios.post(
+            `${NOTIFICATION_SERVICE_URL}/notify/delivery-assignment`,
+            {
+              driverEmail: assignedDriver.email,
+              orderDetails: {
+                orderId: order._id.toString(),
+                customerName,
+                address: customerAddress,
+              },
+            },
+            { headers: { Authorization: token } }
+          );
+        }
       } catch (notificationError) {
         console.error('Failed to send order confirmation notification:', notificationError.response?.data || notificationError.message);
       }
 
       res.status(201).json({ message: 'Order created successfully', order });
     } catch (err) {
+      console.error('Order creation error:', err.message);
       res.status(500).json({ error: 'Failed to create order', details: err.message });
     }
   }
 
   static async getAllOrders(req, res) {
     try {
-      const orders = await Order.find();
+      const { email } = req.query;
+      const token = req.headers.authorization;
+      
+      // Build query object
+      const query = email ? { email } : {};
+      
+      const orders = await Order.find(query);
       // Fetch food item details for each order
       const enrichedOrders = await Promise.all(
         orders.map(async (order) => {
           try {
-            const foodResponse = await axios.get(`${RESTAURANT_SERVICE_URL}/api/food-items/${order.foodItem.foodId}`);
+            const foodResponse = await axios.get(`${RESTAURANT_SERVICE_URL}/api/food-items/${order.foodItem.foodId}`, {
+              headers: { Authorization: token },
+            });
             return {
               ...order.toObject(),
               foodItem: { ...order.foodItem, foodId: foodResponse.data },
@@ -142,13 +172,16 @@ class OrderController {
 
   static async getOrderById(req, res) {
     try {
+      const token = req.headers.authorization;
       const order = await Order.findById(req.params.id);
       if (!order) {
         return res.status(404).json({ error: 'Order not found' });
       }
       // Fetch food item details
       try {
-        const foodResponse = await axios.get(`${RESTAURANT_SERVICE_URL}/api/food-items/${order.foodItem.foodId}`);
+        const foodResponse = await axios.get(`${RESTAURANT_SERVICE_URL}/api/food-items/${order.foodItem.foodId}`, {
+          headers: { Authorization: token },
+        });
         const enrichedOrder = {
           ...order.toObject(),
           foodItem: { ...order.foodItem, foodId: foodResponse.data },

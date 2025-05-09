@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/vieworders.css'; 
 
-function ViewOrders() {
+function ViewOrders({user}) {
   // All existing state and functions remain exactly the same
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,15 +15,21 @@ function ViewOrders() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5004/api/orders');
+      if (!user || !user.email) {
+        setError('User information missing. Please log in.');
+        setOrders([]);
+        return;
+      }
+      const response = await axios.get('http://localhost:5004/api/orders', {
+        params: { email: user.email },
+      });
       setOrders(response.data);
       setLoading(false);
     } catch (err) {
-      setError('Failed to fetch orders');
-      setLoading(false);
+      setError(err.response?.data?.error || 'Failed to fetch orders');
+      setOrders([]);
     }
   };
-
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
       const response = await axios.patch(
