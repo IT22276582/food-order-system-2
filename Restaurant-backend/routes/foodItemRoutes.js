@@ -1,29 +1,52 @@
 import express from 'express';
 import FoodItem from '../models/FoodItem.js';
+import authenticateToken from '../middleware/authenticateToken.js'
 
 const router = express.Router();
 
 // Create a new food item
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
-    const { name, price, description, restaurant, address,availability } = req.body;
-    const foodItem = new FoodItem({ name, price, description, restaurant, address,availability });
+    const { name, price, description, availability } = req.body;
+    const restaurant = req.restaurant; // from token
+
+    const foodItem = new FoodItem({
+      name,
+      price,
+      description,
+      availability,
+      restaurant: restaurant.id
+    });
+
     await foodItem.save();
-    res.status(201).json({ message: 'Food item created successfully', foodItem });
+    res.status(201).json({ message: 'Food item added successfully', foodItem });
   } catch (err) {
     res.status(500).json({ error: 'Failed to create food item', details: err.message });
+    console.log(err.message);
   }
 });
 
+
 // Get all food items
-router.get('/', async (req, res) => {
+// router.get('/', async (req, res) => {
+//   try {
+//     const foodItems = await FoodItem.find();
+//     res.json(foodItems);
+//   } catch (err) {
+//     res.status(500).json({ error: 'Failed to fetch food items', details: err.message });
+//   }
+// });
+// Get all food items
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    const foodItems = await FoodItem.find();
+    const restaurantId = req.restaurant.id;
+    const foodItems = await FoodItem.find({ restaurant: restaurantId });
     res.json(foodItems);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch food items', details: err.message });
   }
 });
+
 
 // Get a single food item by ID
 router.get('/:id', async (req, res) => {
