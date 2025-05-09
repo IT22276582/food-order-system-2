@@ -21,19 +21,26 @@ function CustomerLogin() {
     setIsLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/login', formData);
-      const userData = response.data;
+      const { user, token } = response.data;
+      console.log('Login response:', { user, token }); // Debug response
+      if (!user.username || !user.email) {
+        throw new Error('Invalid user data from server');
+      }
       setMessage('Login successful!');
-      localStorage.setItem('user', JSON.stringify(userData));
-      navigate("/customerHome", { state: { user: userData } });
+      // Store user and token separately
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', token);
+      navigate('/customerHome', { state: { user } });
     } catch (err) {
-      setMessage(err.response?.data || 'Login failed. Please try again.');
+      console.error('Login error:', err.response?.data || err.message);
+      setMessage(err.response?.data?.error || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleRegisterNavigation = () => {
-    navigate("/customerRegister");
+    navigate('/customerRegister');
   };
 
   return (

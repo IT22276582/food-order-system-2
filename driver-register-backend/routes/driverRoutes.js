@@ -15,7 +15,7 @@ router.post('/', addDriver);
 router.get('/', verifyToken, getAllDrivers);
 router.get('/:id', verifyToken, getDriverById);
 router.post('/login', loginDriver);
-router.patch('/:id', verifyToken, updateDriver);
+router.patch('/:id', updateDriver);
 router.get('/location/:location', getDriversByLocation);
 
 export default router;
