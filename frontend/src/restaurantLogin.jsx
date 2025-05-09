@@ -22,10 +22,14 @@ function RestaurantLogin() {
     setIsLoading(true);
     try {
       const response = await axios.post('http://localhost:5002/api/restaurants/login', formData);
-      const restaurantData = response.data;
+      const restaurantData = response.data.restaurant;
+      const token = response.data.token;
       setMessage('Login successful!');
-      localStorage.setItem('restaurant', JSON.stringify(restaurantData));
-      navigate('/food-items');
+      
+      sessionStorage.setItem('restaurant', JSON.stringify(restaurantData));
+      sessionStorage.setItem('token', token);
+
+      navigate('/food-items', { state: { restaurantId: restaurantData._id } });
     } catch (err) {
       setMessage(err.response?.data?.error || 'An error occurred');
     } finally {

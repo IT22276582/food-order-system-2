@@ -26,7 +26,7 @@ function ViewFoodItems({ user }) {
 
   const fetchFoodItems = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/food-items');
+      const response = await axios.get('http://localhost:5002/api/food-items/all');
       setFoodItems(response.data);
       setLoading(false);
     } catch (err) {
@@ -160,8 +160,8 @@ function ViewFoodItems({ user }) {
               <p className="price">${food.price.toFixed(2)}</p>
               <p className="description">{food.description}</p>
               <div className="restaurant-info">
-                <p><strong>{food.restaurant}</strong></p>
-                <p>{food.address || 'Address not specified'}</p>
+                <p><strong>{food.restaurant.name}</strong></p>
+                <p>{food.restaurant.address || 'Address not specified'}</p>
               </div>
               <button
                 onClick={() => handleOrder(food)}
