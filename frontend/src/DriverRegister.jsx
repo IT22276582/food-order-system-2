@@ -6,6 +6,8 @@ import './styles/driverregister.css';
 function DriverRegister() {
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
+    password: '',
     licenseNumber: '',
     vehicleType: '',
     availability: 'Available',
@@ -24,7 +26,7 @@ function DriverRegister() {
     try {
       const response = await axios.post('http://localhost:5001/drivers', formData);
       alert(response.data.message);
-      fetchDrivers();
+      handleNavigateToLogin();
     } catch (err) {
       alert('Error: ' + (err.response?.data?.error || err.message));
     }
@@ -56,6 +58,30 @@ function DriverRegister() {
               name="name"
               placeholder="Enter your full name"
               value={formData.name}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              value={formData.email || ''}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter a password"
+              value={formData.password}
               onChange={handleChange}
               required
               className="form-input"

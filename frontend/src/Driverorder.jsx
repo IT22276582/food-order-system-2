@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 import './styles/driverorder.css'; // 
 
 function ViewOrders() {
@@ -7,14 +8,19 @@ function ViewOrders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const location = useLocation();
+  const driverId = location.state?.driverId; // Assuming driverId is passed in the state
 
   useEffect(() => {
+    console.log('Driver ID:', driverId); // Debug driverId
     fetchOrders();
   }, []);
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5002/api/orders');
+      const response = await axios.get('http://localhost:5004/api/orders/driver', {
+        params: { driverId },
+      });
       setOrders(response.data);
       setLoading(false);
     } catch (err) {
@@ -25,7 +31,7 @@ function ViewOrders() {
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
-      const response = await axios.patch(`http://localhost:5002/api/orders/${orderId}/status`, {
+      const response = await axios.patch(`http://localhost:5004/api/orders/${orderId}/status`, {
         status: newStatus,
       });
       setMessage(response.data.message || 'Order status updated successfully!');

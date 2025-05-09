@@ -8,7 +8,8 @@ function DriversHomePage() {
   const [message, setMessage] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const location = useLocation();
-  const driverId = location.state?.driverId;
+  const driverId = location.state?.driver._id;
+  const token = location.state?.token;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,14 +20,16 @@ function DriversHomePage() {
 
     const fetchDriver = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/drivers/${driverId}`);
+        const response = await axios.get(`http://localhost:5001/drivers/${driverId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
         setDriver(response.data);
       } catch (err) {
         console.error('Error fetching driver details:', err.message);
         setMessage('Failed to fetch driver details.');
       }
     };
-
+    console.log('Driver', driverId);
     fetchDriver();
   }, [driverId]);
 
@@ -45,7 +48,7 @@ function DriversHomePage() {
   };
 
   const handleOrders = () => {
-    navigate('/driverorder');
+    navigate('/driverorder', {state: { driverId} });
   };
 
   const updateLocation = async () => {

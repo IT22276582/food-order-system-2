@@ -5,8 +5,10 @@ import './styles/driverlogin.css'
 
 function DriverLogin() {
   const [formData, setFormData] = useState({
-    licenseNumber: '',
+    emailOrLicense: '',
+    password: '',
   });
+
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
@@ -19,7 +21,13 @@ function DriverLogin() {
     try {
       const response = await axios.post('http://localhost:5001/drivers/login', formData);
       alert('Login successful!');
-      navigate('/driver-home', { state: { driverId: response.data.driver._id } });
+      const token = response.data.token;
+      const driver = response.data.driver;
+      sessionStorage.setItem('token', token);
+      sessionStorage.setItem('driver', JSON.stringify(driver));
+      
+      console.log('DriverID:', driver._id);
+      navigate('/driver-home', { state: { token, driver } });
     } catch (err) {
       setMessage(err.response?.data?.error || 'Login failed. Please try again.');
     }
@@ -35,19 +43,32 @@ function DriverLogin() {
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="input-group">
-            <label htmlFor="licenseNumber" className="input-label">License Number</label>
+            <label htmlFor="emailOrLicense" className="input-label">Email or License Number</label>
             <input
               type="text"
-              id="licenseNumber"
-              name="licenseNumber"
-              placeholder="Enter your license number"
-              value={formData.licenseNumber}
+              id="emailOrLicense"
+              name="emailOrLicense"
+              placeholder="Enter your email or license number"
+              value={formData.emailOrLicense}
               onChange={handleChange}
               required
               className="form-input"
             />
           </div>
 
+          <div className="input-group">
+            <label htmlFor="password" className="input-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
           <button type="submit" className="login-button">
             Sign In
           </button>

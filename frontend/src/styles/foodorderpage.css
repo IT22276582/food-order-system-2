@@ -293,4 +293,107 @@
     .action-buttons {
       flex-direction: column;
     }
+    
   }
+
+
+  /* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* Modal Box */
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Modal Form Fields */
+.modal-content .form-group {
+  margin-bottom: 1rem;
+}
+
+.modal-content label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+/* Action Buttons */
+/* Action Buttons */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center; /* Ensure vertical alignment */
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+  width: 100%; /* Ensure it takes the full width to force a new row */
+}
+
+.submit-update-button {
+  background-color: #1976d2; /* Blue color for Update Item button */
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 40px; /* Fixed height for consistency */
+  line-height: 1.5; /* Ensure vertical text alignment */
+  box-sizing: border-box; /* Include padding in height calculation */
+  display: inline-flex; /* Ensure consistent alignment */
+  align-items: center; /* Center text vertically */
+  justify-content: center; /* Center text horizontally */
+  margin: 0; /* Remove any default margins */
+}
+
+.submit-update-button:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}
+
+.cancel-button {
+  background-color: #1976d2; /* Blue color for Update Item button */
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 40px; /* Fixed height for consistency */
+  line-height: 1.5; /* Ensure vertical text alignment */
+  box-sizing: border-box; /* Include padding in height calculation */
+  display: inline-flex; /* Ensure consistent alignment */
+  align-items: center; /* Center text vertically */
+  justify-content: center; /* Center text horizontally */
+  margin: 0; /* Remove any default margins */
+}
+
+.cancel-button:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}
