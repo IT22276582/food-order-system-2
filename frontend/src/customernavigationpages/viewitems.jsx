@@ -61,19 +61,19 @@ function ViewFoodItems({ user }) {
 
     const quantity = prompt(`Enter quantity for ${food.name}:`, 1);
     if (!quantity || isNaN(quantity) || quantity <= 0) {
-      alert('Invalid quantity');
+      setMessage('Invalid quantity');
       return;
     }
 
     const address = prompt(`Enter your address:`);
     if (!address) {
-      alert('Address is required');
+      setMessage('Address is required');
       return;
     }
 
     const location = prompt(`Enter your location:`);
     if (!location) {
-      alert('Location is required');
+      setMessage('Location is required');
       return;
     }
 
@@ -105,7 +105,12 @@ function ViewFoodItems({ user }) {
       fetchOrders();
     } catch (err) {
       console.error('Order creation error:', err.response?.data);
-      setMessage(err.response?.data?.error || 'Failed to place order');
+      const errorMessage = err.response?.data?.error || 'Failed to place order';
+      if (errorMessage === 'No available drivers for this location. Please try again later.') {
+        alert(errorMessage);
+      } else {
+        setMessage(errorMessage);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -118,11 +123,24 @@ function ViewFoodItems({ user }) {
     setMessage('Payment completed successfully!');
   };
 
-  const closePaymentModal = () => {
+  const closePaymentModal = async () => {
+    if (savedOrderId) {
+      try {
+        const token = localStorage.getItem('token');
+        console.log(`Deleting order ${savedOrderId} due to payment cancellation`); // Debug
+        await axios.delete(`http://localhost:5004/api/orders/${savedOrderId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMessage('Order cancelled and deleted');
+        fetchOrders(); // Refresh orders list
+      } catch (err) {
+        console.error('Order deletion error:', err.response?.data);
+        setMessage(err.response?.data?.error || 'Failed to delete cancelled order');
+      }
+    }
     setShowPayment(false);
     setOrderDetails(null);
     setSavedOrderId(null);
-    setMessage('Payment cancelled');
   };
 
   const handleUpdateStatus = async (orderId, newStatus) => {
@@ -201,24 +219,17 @@ function ViewFoodItems({ user }) {
                     <p><strong>Email:</strong> {order.email}</p>
                     <p><strong>Address:</strong> {order.customerAddress}</p>
                     <p><strong>Location:</strong> {order.location}</p>
+                    <p><strong>Driver:</strong> {order.driverName}</p>
                   </div>
                   
                   <div className="order-items">
-                    <p><strong>Item:</strong> {order.foodItem.foodId.name}</p>
+                    <p><strong>Item:</strong> {order.foodItem.foodId?.name || 'Unknown Item'}</p>
                     <p><strong>Quantity:</strong> {order.foodItem.quantity}</p>
                     <p><strong>Total:</strong> ${order.totalAmount.toFixed(2)}</p>
-                    <p><strong>Driver:</strong> {order.driverName || 'Not assigned'}</p>
                   </div>
                 </div>
                 
                 <div className="order-actions">
-                  <button
-                    onClick={() => handleUpdateStatus(order._id, 'Assigned')}
-                    className="status-button assign"
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? 'Processing...' : 'Assign Driver'}
-                  </button>
                   <button
                     onClick={() => handleUpdateStatus(order._id, 'Delivered')}
                     className="status-button deliver"
@@ -233,7 +244,7 @@ function ViewFoodItems({ user }) {
         </div>
 
         {message && (
-          <div className={`message ${message.includes('Failed') || message.includes('cancelled') ? 'error' : 'success'}`}>
+          <div className={`message ${message.includes('Failed') || message.includes('cancelled') || message.includes('No available drivers') ? 'error' : 'success'}`}>
             {message}
           </div>
         )}

@@ -11,7 +11,7 @@ const orderSchema = new mongoose.Schema({
     quantity: { type: Number, required: true },
   },
   totalAmount: { type: Number, required: true },
-  status: { type: String, enum: ['Pending', 'Assigned', 'Delivered'], default: 'Pending' },
+  status: { type: String, enum: ['Pending', 'Delivered'], default: 'Pending' },
   assignedDriver: { type: mongoose.Schema.Types.ObjectId, default: null },
   driverName: { type: String, default: null },
 }, { timestamps: true });
