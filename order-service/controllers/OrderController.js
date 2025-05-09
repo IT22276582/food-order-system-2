@@ -33,7 +33,7 @@ class OrderController {
       }
 
       // Validate amount
-      const calculatedAmount = food.price * foodItem.quantity * 300; // Convert to LKR
+      const calculatedAmount = food.price * foodItem.quantity*300; // Convert to LKR
       if (amount !== calculatedAmount) {
         return res.status(400).json({ error: 'Invalid amount', expected: calculatedAmount, received: amount });
       }
@@ -307,6 +307,25 @@ class OrderController {
       res.status(500).json({ error: 'Failed to delete order', details: err.message });
     }
   }
+
+  static async getOrdersByDriverId(req, res) {
+    try {
+      const { driverId } = req.query;
+      console.log(mongoose.Types.ObjectId.isValid(driverId)); // Debug
+      if (!mongoose.Types.ObjectId.isValid(driverId)) {
+      return res.status(400).json({ error: 'Invalid driver ID' });
+    }
+      const orders = await Order.find({ assignedDriver: driverId });
+      if (!orders.length) {
+        return res.status(404).json({ error: 'No orders found for this driver' });
+      }
+      res.json(orders);
+    } catch (err) {
+      console.error('Error fetching orders by driver ID:', err.message); // Debug
+      res.status(500).json({ error: 'Failed to fetch orders', details: err.message });
+    }
+  }
+
 }
 
 export default OrderController;

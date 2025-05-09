@@ -3,19 +3,43 @@ import jwt from 'jsonwebtoken';
 
 export const addDriver = async (req, res) => {
   try {
-    const { name, licenseNumber, vehicleType, availability, location } = req.body;
+    const { name, licenseNumber, vehicleType, availability, location, email, password } = req.body;
 
-    if (!location) {
-      return res.status(400).json({ error: 'Location is required' });
+    // Basic validation
+    if (!location || !email || !licenseNumber || !password) {
+      return res.status(400).json({ error: 'Location, email, license number, and password are required' });
     }
 
-    const newDriver = new Driver({ name, licenseNumber, vehicleType, availability, location });
+    // Uniqueness check
+    const existingDriver = await Driver.findOne({
+      $or: [{ email }, { licenseNumber }]
+    });
+
+    if (existingDriver) {
+      return res.status(409).json({
+        error: 'A driver with this email or license number already exists'
+      });
+    }
+
+    const newDriver = new Driver({
+      name,
+      licenseNumber,
+      vehicleType,
+      availability,
+      location,
+      email,
+      password
+    });
+
     await newDriver.save();
     res.status(201).json({ message: 'Driver added successfully', driver: newDriver });
+
   } catch (err) {
     res.status(500).json({ error: 'Something went wrong', details: err.message });
   }
 };
+
+
 
 export const getAllDrivers = async (req, res) => {
   try {
@@ -40,14 +64,24 @@ export const getDriverById = async (req, res) => {
 
 export const loginDriver = async (req, res) => {
   try {
-    const { licenseNumber } = req.body;
+    const { emailOrLicense, password } = req.body;
 
-    const driver = await Driver.findOne({ licenseNumber });
+    if (!emailOrLicense || !password) {
+      return res.status(400).json({ error: 'Email or license number and password are required' });
+    }
+
+    const driver = await Driver.findOne({
+      $or: [{ email: emailOrLicense }, { licenseNumber: emailOrLicense }]
+    });
+
     if (!driver) {
       return res.status(404).json({ error: 'Driver not found' });
     }
 
-    // Generate JWT
+    if (driver.password !== password) {
+      return res.status(401).json({ error: 'Incorrect password' });
+    }
+
     const token = jwt.sign(
       { id: driver._id, licenseNumber: driver.licenseNumber },
       process.env.SECRET_KEY,
@@ -59,6 +93,7 @@ export const loginDriver = async (req, res) => {
     res.status(500).json({ error: 'Error logging in', details: err.message });
   }
 };
+
 
 export const updateDriver = async (req, res) => {
   try {
